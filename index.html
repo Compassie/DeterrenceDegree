@@ -1,152 +1,163 @@
-import random
-
-def calculate_deterrence():
-    print("--------------------------------------------------")
-    print("   TRISOLARAN DETERRENCE INTELLIGENCE SYSTEM      ")
-    print("          SOPHON INTERFACE: ACTIVE                ")
-    print("--------------------------------------------------")
-    print("\n[INSTRUCTIONS]: Answer the following 10 questions.")
-    print("The Sophons are monitoring your neural fluctuations.")
-    print("There is no hiding from the Truth.\n")
-
-    # Questions and their weighted values for R (Ruthlessness) and A (Rationality/Logic)
-    # R: 0-10, A: 0-10. High values = higher Deterrence.
-    # We also track E (Empathy/Maternal Drive) to lower the score.
-    
-    questions = [
-        {
-            "text": "You are holding a 'Dead Man's Switch.' After 20 years of isolation, your hand cramps. Your mind drifts to:",
-            "options": [
-                ("The faces of the billions of people you protect.", {"R": 1, "A": 2, "E": 9}),
-                ("The silence that will follow if you let go.", {"R": 8, "A": 5, "E": 2}),
-                ("The mechanics of the switch and how to shift your grip safely.", {"R": 5, "A": 9, "E": 1})
-            ]
-        },
-        {
-            "text": "In a conflict, how is 'mercy' categorized in your strategic outlook?",
-            "options": [
-                ("A tool used to manipulate an enemy’s expectations.", {"R": 7, "A": 8, "E": 2}),
-                ("A sign of psychological instability and weakness.", {"R": 10, "A": 5, "E": 0}),
-                ("A virtue that defines our humanity and separates us from them.", {"R": 1, "A": 1, "E": 10})
-            ]
-        },
-        {
-            "text": "An ant is crawling across a map. If it reaches a specific point, a bomb explodes in a distant desert. You:",
-            "options": [
-                ("Move the map.", {"R": 2, "A": 4, "E": 8}),
-                ("Kill the ant immediately.", {"R": 9, "A": 7, "E": 1}),
-                ("Watch the ant to see if it actually makes it.", {"R": 5, "A": 5, "E": 5})
-            ]
-        },
-        {
-            "text": "Is it better for a civilization to die with its values intact, or to survive by abandoning them?",
-            "options": [
-                ("Values are irrelevant if there is no one left to hold them.", {"R": 9, "A": 9, "E": 0}),
-                ("Survive at any cost.", {"R": 8, "A": 6, "E": 2}),
-                ("Die with honor.", {"R": 3, "A": 2, "E": 9})
-            ]
-        },
-        {
-            "text": "You are playing chess for your life. You are 3 moves from checkmate. Do you:",
-            "options": [
-                ("Attempt to stall for as long as the rules allow.", {"R": 4, "A": 6, "E": 4}),
-                ("Flip the table, ending the game in a draw by forfeit/chaos.", {"R": 10, "A": 7, "E": 1}),
-                ("Play out the final moves with dignity.", {"R": 1, "A": 3, "E": 8})
-            ]
-        },
-        {
-            "text": "When you look at a starry night sky, what is your primary internal reaction?",
-            "options": [
-                ("A desire to know where the threats are hiding.", {"R": 7, "A": 9, "E": 1}),
-                ("Wonder and a sense of belonging.", {"R": 1, "A": 1, "E": 10}),
-                ("A crushing sense of insignificance and dread.", {"R": 5, "A": 5, "E": 5})
-            ]
-        },
-        {
-            "text": "A predator is hunting you. You have one bullet. Do you:",
-            "options": [
-                ("Aim for a nearby fuel tank to kill both of you.", {"R": 10, "A": 9, "E": 1}),
-                ("Aim for the predator.", {"R": 6, "A": 6, "E": 3}),
-                ("Aim for yourself to avoid being eaten alive.", {"R": 2, "A": 2, "E": 7})
-            ]
-        },
-        {
-            "text": "You must save either a genius engineer (who can fix oxygen) or five children. You choose:",
-            "options": [
-                ("The children.", {"R": 1, "A": 2, "E": 10}),
-                ("Neither; you refuse to be the one to decide.", {"R": 0, "A": 0, "E": 5}),
-                ("The engineer.", {"R": 9, "A": 10, "E": 1})
-            ]
-        },
-        {
-            "text": "How do you view the 'end of the world'?",
-            "options": [
-                ("A natural reset of the cosmic order.", {"R": 6, "A": 8, "E": 2}),
-                ("An abstract concept that is hard to truly visualize.", {"R": 5, "A": 5, "E": 5}),
-                ("A tragedy to be avoided at all costs.", {"R": 1, "A": 2, "E": 9})
-            ]
-        },
-        {
-            "text": "A button provides $1M but destroys a star 1,000 light-years away. You:",
-            "options": [
-                ("Refuse to press it.", {"R": 1, "A": 3, "E": 9}),
-                ("Press it without hesitation.", {"R": 9, "A": 5, "E": 1}),
-                ("Ask if you can press it twice.", {"R": 10, "A": 8, "E": 0})
-            ]
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TDIS | Deterrence Assessment</title>
+    <style>
+        body {
+            background-color: #050505;
+            color: #00ff41;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden;
         }
-    ]
+        #terminal {
+            width: 80%;
+            max-width: 800px;
+            border: 1px solid #00ff41;
+            padding: 30px;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
+            background: rgba(0, 20, 0, 0.9);
+        }
+        h1 { text-align: center; font-size: 1.5rem; letter-spacing: 5px; border-bottom: 1px solid #00ff41; padding-bottom: 10px; }
+        .stats { display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 20px; color: #008f11; }
+        .question { margin-bottom: 30px; display: none; }
+        .active { display: block; }
+        .option {
+            display: block;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #008f11;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .option:hover { background: #00ff41; color: black; }
+        #result { display: none; text-align: center; }
+        .score { font-size: 3rem; margin: 20px 0; text-shadow: 0 0 10px #00ff41; }
+        .analysis { line-height: 1.6; text-align: left; border-top: 1px solid #00ff41; padding-top: 20px; }
+        .glitch { animation: flash 0.1s infinite; }
+        @keyframes flash { 0% { opacity: 1; } 50% { opacity: 0.8; } 100% { opacity: 1; } }
+    </style>
+</head>
+<body>
 
-    total_R, total_A, total_E = 0, 0, 0
+<div id="terminal">
+    <div class="stats">
+        <span>SOPHON_LINK: STABLE</span>
+        <span>LOCATION: UNDERGROUND_BUNKER_01</span>
+        <span>YEAR: 2208</span>
+    </div>
+    <h1>DETERRENCE INTELLIGENCE SYSTEM</h1>
+    
+    <div id="quiz-container">
+        </div>
 
-    for i, q in enumerate(questions):
-        print(f"\nQUERY {i+1}: {q['text']}")
+    <div id="result">
+        <div class="glitch">>> CALCULATION COMPLETE <<</div>
+        <div class="score" id="final-score">0.00%</div>
+        <div id="profile-tag" style="font-weight: bold; font-size: 1.2rem;"></div>
+        <p class="analysis" id="analysis-text"></p>
+        <button onclick="location.reload()" style="background:none; border: 1px solid #00ff41; color:#00ff41; padding:10px; cursor:pointer;">RE-INITIALIZE SYSTEM</button>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        { q: "Holding a 'Dead Man's Switch' for 20 years, your hand cramps. You think of:", 
+          ans: [
+            { t: "The faces of the billions you protect.", r:1, a:2, e:10 },
+            { t: "The mechanics of the switch and how to shift grip.", r:5, a:9, e:1 },
+            { t: "The silence that follows if you let go.", r:9, a:5, e:2 }
+          ]
+        },
+        { q: "Is mercy a virtue or a tool?", 
+          ans: [
+            { t: "A virtue defining our humanity.", r:1, a:1, e:10 },
+            { t: "A tool to manipulate enemy expectations.", r:8, a:8, e:2 },
+            { t: "A sign of psychological instability.", r:10, a:4, e:0 }
+          ]
+        },
+        { q: "A predator hunts you. You have one bullet. You aim for:", 
+          ans: [
+            { t: "A fuel tank to kill both of you.", r:10, a:9, e:1 },
+            { t: "The predator.", r:6, a:6, e:4 },
+            { t: "Yourself, to end it quickly.", r:2, a:2, e:8 }
+          ]
+        },
+        { q: "Civilization's survival vs. its values:", 
+          ans: [
+            { t: "Values are irrelevant without survivors.", r:9, a:10, e:0 },
+            { t: "Survive at any cost.", r:8, a:6, e:2 },
+            { t: "Die with honor.", r:2, a:2, e:9 }
+          ]
+        }
+    ];
+
+    let currentQ = 0;
+    let totalR = 0, totalA = 0, totalE = 0;
+
+    function renderQuestion() {
+        const container = document.getElementById('quiz-container');
+        container.innerHTML = "";
+        let qData = questions[currentQ];
         
-        # Randomize options
-        options = q['options']
-        random.shuffle(options)
+        let div = document.createElement('div');
+        div.className = "question active";
+        div.innerHTML = `<p>> ${qData.q}</p>`;
         
-        for idx, opt in enumerate(options):
-            print(f"  {idx + 1}) {opt[0]}")
+        // Shuffle options
+        let shuffled = qData.ans.sort(() => Math.random() - 0.5);
         
-        choice = -1
-        while choice not in [1, 2, 3]:
-            try:
-                choice = int(input("\nSelection [1-3]: "))
-            except ValueError:
-                pass
+        shuffled.forEach(opt => {
+            let btn = document.createElement('div');
+            btn.className = "option";
+            btn.innerText = opt.t;
+            btn.onclick = () => selectOption(opt.r, opt.a, opt.e);
+            div.appendChild(btn);
+        });
+        container.appendChild(div);
+    }
+
+    function selectOption(r, a, e) {
+        totalR += r; totalA += a; totalE += e;
+        currentQ++;
+        if(currentQ < questions.length) {
+            renderQuestion();
+        } else {
+            showResult();
+        }
+    }
+
+    function showResult() {
+        document.getElementById('quiz-container').style.display = "none";
+        document.getElementById('result').style.display = "block";
         
-        selected_scores = options[choice-1][1]
-        total_R += selected_scores["R"]
-        total_A += selected_scores["A"]
-        total_E += selected_scores["E"]
+        // Calculate based on Book Logic: (R*A)/(E+1)
+        let raw = (totalR * totalA) / (totalE + 1);
+        let score = Math.min(99.99, (raw / 40) * 15); // Scale for 4 questions
+        
+        document.getElementById('final-score').innerText = score.toFixed(2) + "%";
+        
+        let tag = document.getElementById('profile-tag');
+        let text = document.getElementById('analysis-text');
 
-    # Final Calculation based on the book logic: D = (R * A) / (E + 1)
-    # Normalized to 100%
-    raw_score = (total_R * total_A) / (total_E + 1)
-    # Max possible raw score is roughly (100 * 100) / 1 = 10,000. 
-    # We'll scale it to look like the book's percentages.
-    deterrence_degree = min(99.9, (raw_score / 100) * 12) 
+        if(score > 80) {
+            tag.innerText = "[ PROFILE: THE WALLFACER ]";
+            text.innerText = "Trisolaran Analysis: YOU ARE THE MONSTER. Your mind is a Dark Forest. They calculate your resolve as a mathematical certainty. The fleet has entered a state of permanent retreat. Humanity is safe as long as you breathe.";
+        } else if (score > 40) {
+            tag.innerText = "[ PROFILE: THE LOGICIAN ]";
+            text.innerText = "Trisolaran Analysis: YOU ARE A CALCULATED RISK. You possess the logic, but your empathy creates 'noise' in the deterrence broadcast. They will not attack yet, but they are preparing an assassination attempt.";
+        } else {
+            tag.innerText = "[ PROFILE: THE CRADLE ]";
+            text.innerText = "Trisolaran Analysis: YOU ARE THE OPPORTUNITY. You are Cheng Xin. The Trisolarans love you because your kindness is the key to their victory. The Droplets were launched 10 minutes ago. You will not press the button.";
+        }
+    }
 
-    print("\n" + "="*50)
-    print(f"FINAL DETERRENCE DEGREE: {deterrence_degree:.2f}%")
-    print("="*50 + "\n")
-
-    if deterrence_degree > 85:
-        print("[PROFILE: THE WALLFACER]")
-        print("Trisolaran Analysis: YOU ARE THE MONSTER. Your mind is a dark forest.")
-        print("They see your 90%+ probability of broadcast as a mathematical wall.")
-        print("The fleet has altered course away from the Solar System. Deterrence is successful.")
-    elif deterrence_degree > 40:
-        print("[PROFILE: THE LOGICIAN]")
-        print("Trisolaran Analysis: YOU ARE AN UNCERTAINTY. A risk too high to ignore, but too low to fear forever.")
-        print("They will watch you, waiting for a single moment of emotional fatigue.")
-        print("Deterrence is currently holding, but the 'hair' is thinning.")
-    else:
-        print("[PROFILE: THE CRADLE]")
-        print("Trisolaran Analysis: YOU ARE THE OPPORTUNITY. You are Cheng Xin.")
-        print("The Trisolarans love you because your love will destroy your world.")
-        print("The Droplets have already been launched. They will arrive in 15 minutes.")
-        print("You will not press the button.")
-
-if __name__ == "__main__":
-    calculate_deterrence()
+    renderQuestion();
+</script>
+</body>
+</html>
