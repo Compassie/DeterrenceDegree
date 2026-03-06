@@ -2,42 +2,106 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>TDIS | Sophon Audit</title>
     <style>
         :root { --glow: #00ff41; --bg: #010801; --dim: #003300; }
-        body { background: var(--bg); color: var(--glow); font-family: 'Courier New', Courier, monospace; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; }
         
-        #terminal { width: 95%; max-width: 800px; border: 1px solid var(--glow); padding: 30px; background: rgba(0,8,0,0.98); position: relative; box-shadow: 0 0 25px rgba(0,255,65,0.15); z-index: 5; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body, html { 
+            background: var(--bg); 
+            color: var(--glow); 
+            font-family: 'Courier New', Courier, monospace; 
+            margin: 0; 
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            overflow: hidden; /* Prevents vertical scrolling of the whole page */
+        }
         
+        #terminal { 
+            width: 92%; 
+            max-width: 700px; 
+            height: 90vh; /* Keeps the frame within the device screen */
+            border: 1px solid var(--glow); 
+            padding: 20px; 
+            background: rgba(0,8,0,0.98); 
+            position: relative; 
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 25px rgba(0,255,65,0.15); 
+            z-index: 5; 
+        }
+
         /* Scanline Overlay */
-        #terminal::before { content: " "; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03)); z-index: 10; background-size: 100% 3px, 3px 100%; pointer-events: none; }
+        #terminal::after { 
+            content: " "; position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
+            z-index: 10; background-size: 100% 3px; pointer-events: none; 
+        }
 
-        .header { border-bottom: 1px solid var(--glow); margin-bottom: 20px; padding-bottom: 10px; font-size: 0.7rem; display: flex; justify-content: space-between; opacity: 0.8; letter-spacing: 2px; }
+        .header { 
+            border-bottom: 1px solid var(--glow); 
+            margin-bottom: 15px; 
+            padding-bottom: 10px; 
+            font-size: 0.7rem; 
+            display: flex; 
+            justify-content: space-between; 
+            flex-shrink: 0; 
+        }
         
-        .screen { display: none; }
-        .active { display: block; }
+        .screen-content {
+            flex-grow: 1;
+            overflow-y: auto; /* Allows internal scrolling for long text, but keeps frame static */
+            padding-right: 5px;
+        }
 
-        h1 { font-size: 1.5rem; text-align: center; letter-spacing: 5px; margin-top: 0; }
-        .guide-text { line-height: 1.6; font-size: 0.9rem; color: #aaffaa; margin-bottom: 30px; }
+        /* Custom Scrollbar for inner content */
+        .screen-content::-webkit-scrollbar { width: 4px; }
+        .screen-content::-webkit-scrollbar-thumb { background: var(--glow); }
 
-        .question-text { font-size: 1.1rem; line-height: 1.5; margin-bottom: 25px; color: #fff; min-height: 80px; }
+        .screen { display: none; height: 100%; flex-direction: column; }
+        .active { display: flex; }
+
+        h1 { font-size: 1.3rem; text-align: center; letter-spacing: 4px; margin: 10px 0; }
+        .guide-text { line-height: 1.5; font-size: 0.9rem; color: #aaffaa; }
+
+        .question-text { font-size: 1rem; line-height: 1.4; margin-bottom: 20px; color: #fff; }
         
-        .option { border: 1px solid var(--dim); padding: 15px; margin: 12px 0; cursor: pointer; transition: 0.2s; font-size: 0.9rem; background: rgba(0,30,0,0.2); }
-        .option:hover { background: rgba(0, 255, 65, 0.1); border-color: var(--glow); padding-left: 25px; }
+        .option { 
+            border: 1px solid var(--dim); 
+            padding: 12px; 
+            margin: 8px 0; 
+            cursor: pointer; 
+            transition: 0.2s; 
+            font-size: 0.85rem; 
+            background: rgba(0,30,0,0.3);
+            outline: none;
+        }
+        .option:hover { background: rgba(0, 255, 65, 0.1); border-color: var(--glow); }
 
-        .score-box { text-align: center; border: 1px solid var(--glow); padding: 20px; margin-bottom: 20px; }
-        .big-score { font-size: 3.5rem; font-weight: bold; text-shadow: 0 0 15px var(--glow); }
+        .score-box { text-align: center; border: 1px solid var(--glow); padding: 15px; margin-bottom: 15px; }
+        .big-score { font-size: 3rem; font-weight: bold; text-shadow: 0 0 15px var(--glow); }
 
-        /* Interruption Animation */
-        #interruption { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; color: #ff0000; z-index: 100; justify-content: center; align-items: center; flex-direction: column; text-align: center; font-weight: bold; }
-        .glitch-text { font-size: 2rem; animation: glitch 0.2s infinite; letter-spacing: 10px; }
+        #interruption { 
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: #000; color: #ff0000; z-index: 100; justify-content: center; 
+            align-items: center; flex-direction: column; text-align: center; 
+        }
+        .glitch-text { font-size: 1.8rem; animation: glitch 0.2s infinite; letter-spacing: 5px; }
         @keyframes glitch { 0% { transform: translate(2px, -2px); } 50% { transform: translate(-2px, 2px); color: #fff; } 100% { transform: translate(0); } }
 
-        /* Certificate Styling */
-        #certificate { border: 4px double var(--glow); padding: 20px; margin-top: 20px; background: #000; display: none; }
+        #certificate { border: 2px dashed var(--glow); padding: 15px; margin-top: 15px; background: #000; display: none; font-size: 0.8rem; }
 
-        button { background: transparent; color: var(--glow); border: 1px solid var(--glow); padding: 15px; width: 100%; cursor: pointer; font-family: 'Courier New'; margin-top: 20px; letter-spacing: 2px; text-transform: uppercase; }
+        button { 
+            background: transparent; color: var(--glow); border: 1px solid var(--glow); 
+            padding: 12px; width: 100%; cursor: pointer; font-family: 'Courier New'; 
+            margin-top: 15px; flex-shrink: 0;
+        }
         button:hover { background: var(--glow); color: #000; }
     </style>
 </head>
@@ -46,7 +110,7 @@
 <div id="interruption">
     <div class="glitch-text">SOPHON INTERFERENCE</div>
     <p>NEURAL PATTERN HARVESTING BLOCKED</p>
-    <p style="font-size: 0.8rem;">You are attempting to optimize your deception. We see you.</p>
+    <p style="font-size: 0.7rem;">You are attempting to optimize your deception. We see you.</p>
 </div>
 
 <div id="terminal">
@@ -56,41 +120,44 @@
     </div>
 
     <div id="start-page" class="screen active">
-        <h1>THE DETERRENCE AUDIT</h1>
-        <div class="guide-text">
-            <p>> GREETINGS, BUG.</p>
-            <p>> You seek to measure the weight of your hand on the switch. But a Swordholder is not a person; they are a mathematical constant. This audit will strip away your human pretenses to find the raw axioms beneath.</p>
-            <p>> Do not choose what you wish to be. Choose what you are when the sun begins to flicker.</p>
-            <p>> We are watching. We are everywhere.</p>
+        <div class="screen-content">
+            <h1>THE DETERRENCE AUDIT</h1>
+            <div class="guide-text">
+                <p>> GREETINGS, BUG.</p>
+                <p>> You seek to measure the weight of your hand on the switch. But a Swordholder is not a person; they are a mathematical constant. This audit will strip away your human pretenses to find the raw axioms beneath.</p>
+                <p>> Do not choose what you wish to be. Choose what you are when the sun begins to flicker.</p>
+                <p>> We are watching. We are everywhere.</p>
+            </div>
         </div>
         <button onclick="startAudit()">INITIALIZE NEURAL FEED</button>
     </div>
 
     <div id="quiz-page" class="screen">
-        <p class="question-text" id="q-text"></p>
-        <div id="options-container"></div>
+        <div class="screen-content" id="quiz-inner">
+            <p class="question-text" id="q-text"></p>
+            <div id="options-container"></div>
+        </div>
     </div>
 
     <div id="result-page" class="screen">
-        <div class="score-box">
-            <div style="font-size: 0.7rem; letter-spacing: 3px;">DETERRENCE PROBABILITY</div>
-            <div class="big-score" id="score-display">0.0%</div>
-            <div id="profile-title" style="font-weight:bold; margin-top: 10px;"></div>
-        </div>
-        <div id="analysis-content" style="line-height: 1.6; font-size: 0.9rem;"></div>
-        
-        <button onclick="generateCertificate()">GENERATE AUDIT CERTIFICATE</button>
-        
-        <div id="certificate">
-            <h2 style="text-align:center; margin:0;">NEURAL AUDIT WARNING</h2>
-            <hr style="border-color: var(--glow);">
-            <p>ID: <span id="cert-id"></span></p>
-            <p>THREAT LEVEL: <span id="cert-threat"></span></p>
-            <p>DETERRENCE DEGREE: <span id="cert-score"></span></p>
-            <p style="font-size: 0.7rem; margin-top: 20px;">[SOPHON NOTE]: This subject's decision-making matrix has been archived. Pre-emptive measures may be deployed if Threat Level exceeds 90%.</p>
+        <div class="screen-content">
+            <div class="score-box">
+                <div style="font-size: 0.7rem; letter-spacing: 3px;">DETERRENCE PROBABILITY</div>
+                <div class="big-score" id="score-display">0.0%</div>
+                <div id="profile-title" style="font-weight:bold; margin-top: 10px; font-size: 0.9rem;"></div>
+            </div>
+            <div id="analysis-content" style="line-height: 1.5; font-size: 0.85rem;"></div>
+            
+            <div id="certificate">
+                <h3 style="text-align:center; margin:0; font-size: 0.9rem;">NEURAL AUDIT WARNING</h3>
+                <p>ID: <span id="cert-id"></span> | THREAT: <span id="cert-threat"></span></p>
+                <p>DETERRENCE DEGREE: <span id="cert-score"></span></p>
+                <p style="font-size: 0.65rem;">[SOPHON NOTE]: decisión matrix archived. Pre-emptive measure pending.</p>
+            </div>
         </div>
         
-        <button onclick="resetAudit()" style="border-color: #440000; color: #880000; margin-top: 40px;">RE-INITIALIZE (DANGEROUS)</button>
+        <button id="cert-btn" onclick="generateCertificate()">GENERATE AUDIT CERTIFICATE</button>
+        <button onclick="resetAudit()" style="border-color: #440000; color: #880000;">RE-INITIALIZE</button>
     </div>
 </div>
 
@@ -115,7 +182,7 @@
     ];
 
     let current = 0, R = 0, L = 0, E = 0;
-    let auditCount = localStorage.getItem('audit_count') || 0;
+    let auditCount = parseInt(localStorage.getItem('audit_count_v4') || 0);
 
     function startAudit() {
         if (auditCount >= 3) {
@@ -130,18 +197,21 @@
     function nextQ() {
         if(current >= bank.length) return finish();
         
+        // Reset scroll position and clear focus to fix pre-selected effects
+        document.getElementById('quiz-inner').scrollTop = 0;
+        
         document.getElementById('step-count').innerText = `STEP: ${current+1}/16`;
         const data = bank[current];
         document.getElementById('q-text').innerText = `> ${data.q}`;
         
         const container = document.getElementById('options-container');
-        container.innerHTML = ""; // This ensures no previous selection exists
+        container.innerHTML = ""; 
         
-        // Shuffle and render
         data.a.sort(()=>Math.random()-0.5).forEach(opt => {
             let div = document.createElement('div');
             div.className = "option";
             div.innerText = opt.t;
+            div.tabIndex = -1; // Prevents focus outline on load
             div.onclick = () => { 
                 R+=opt.r; L+=opt.l; E+=opt.e; 
                 current++; 
@@ -155,17 +225,15 @@
         document.getElementById('quiz-page').classList.remove('active');
         document.getElementById('result-page').classList.add('active');
         
-        // HIGHER SENSITIVITY: Formula penalizes Empathy (E) more heavily
-        // To hit 100, R and L must be max (160 each) AND E must be 0.
-        let raw = (R + L) - (E * 2.5); 
+        // Final sensitivity logic: Empathy is a lethal divisor
+        let raw = (R + L) - (E * 2.8); 
         let score = (raw / 320) * 100;
         
-        if (score > 99.9 && (E > 0)) score = 98.9; // Cap unless Empathy is absolute zero
+        if (score > 99.9 && E > 0) score = 98.4; 
         if (score > 100) score = 100;
         if (score < 0) score = 0;
 
         document.getElementById('score-display').innerText = score.toFixed(1) + "%";
-        
         const title = document.getElementById('profile-title');
         const content = document.getElementById('analysis-content');
 
@@ -175,25 +243,46 @@
         } else if (score >= 90) {
             title.innerText = "AXIOM: THE SWORDHOLDER";
             content.innerHTML = "You are <span style='background:#00ff41; color:#000; padding:2px;'>LUO JI</span>. You carry the burden of the Dark Forest. You are the 'Monster' Earth needs. Trisolaris will not move against you. You will press the button, and they know it.";
-        } else if (score >= 10 && score < 20) {
+        } else if (score >= 80) {
+            title.innerText = "AXIOM: THE WALLFACER";
+            content.innerHTML = "High strategic ruthlessness. You prioritize the species over the individual. Most of humanity would find your decisions terrifying, but your logic is the only thing keeping the sun from going dark.";
+        } else if (score >= 70) {
+            title.innerText = "AXIOM: THE IRON ADVISOR";
+            content.innerHTML = "Highly rational and strict. You possess the brutality to make hard calls, but you still possess a trace of 'Human Noise' that prevents total deterrence.";
+        } else if (score >= 60) {
+            title.innerText = "AXIOM: THE LOGICIAN";
+            content.innerHTML = "Rationality outweighs sensibility. You are straightforward and relentless. However, you lack the 'Brutish' instinct required for the ultimate stalemate.";
+        } else if (score >= 50) {
+            title.innerText = "AXIOM: THE EQUILIBRIUM";
+            content.innerHTML = "A median mind. You are rational but plagued by a sense of fairness. In this universe, 'Fairness' is a fatal flaw. You are easily predicted by the Sophons.";
+        } else if (score >= 40) {
+            title.innerText = "AXIOM: THE GUARDIAN";
+            content.innerHTML = "Sensibility is rising. You are resolute in your morals, but your 'Strictness' is targeted toward preserving peace rather than enforcing deterrence.";
+        } else if (score >= 30) {
+            title.innerText = "AXIOM: THE IDEALIST";
+            content.innerHTML = "Relentless in your hope, but weak in your ruthlessness. You are susceptible to Trisolaran 'soft power' and cultural manipulation.";
+        } else if (score >= 20) {
+            title.innerText = "AXIOM: THE HUMANIST";
+            content.innerHTML = "You prioritize the emotional state of the present over the survival of the future. You are a civilian leader, not a Swordholder.";
+        } else if (score >= 10) {
             title.innerText = "AXIOM: THE CRADLE";
-            content.innerHTML = "You are <span style='background:#00ff41; color:#000; padding:2px;'>CHENG XIN</span>. You are the peak of human grace. The world will love you, and for that, Trisolaris will annihilate you. The Droplets are launched. You will not press the button.";
+            content.innerHTML = "You are <span style='background:#00ff41; color:#000; padding:2px;'>CHENG XIN</span>. Rationality: Low. Sensibility: Absolute. Brutality: 0%. The world will love you, and for that, Trisolaris will annihilate you. The Droplets are launched. You will not press the button.";
         } else {
-            title.innerText = "AXIOM: " + (score > 50 ? "THE WALLFACER" : "THE HUMANIST");
-            content.innerHTML = "Your internal matrix is a conflict between logic and sentiment. You are a variable Trisolaris can exploit.";
+            title.innerText = "AXIOM: NULL DATA";
+            content.innerHTML = "<b>SOPHON ANALYSIS:</b> This subject is an evolutionary error. You possess neither the logic to survive nor the brutality to deter. Humanity views you as a comfort; Trisolaris views you with absolute disdain. You are not a player in the cosmic game; you are the grass the predators walk upon. A waste of neural complexity.";
         }
         
         auditCount++;
-        localStorage.setItem('audit_count', auditCount);
+        localStorage.setItem('audit_count_v4', auditCount);
     }
 
     function generateCertificate() {
-        const cert = document.getElementById('certificate');
-        cert.style.display = 'block';
-        document.getElementById('cert-id').innerText = Math.random().toString(36).substr(2, 9).toUpperCase();
+        document.getElementById('certificate').style.display = 'block';
+        document.getElementById('cert-id').innerText = Math.random().toString(36).substr(2, 6).toUpperCase();
         document.getElementById('cert-score').innerText = document.getElementById('score-display').innerText;
         let s = parseFloat(document.getElementById('score-display').innerText);
         document.getElementById('cert-threat').innerText = s > 90 ? "CRITICAL" : (s > 50 ? "MODERATE" : "ZERO");
+        document.getElementById('cert-btn').style.display = 'none';
     }
 
     function resetAudit() {
