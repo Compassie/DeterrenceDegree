@@ -2,112 +2,76 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>TDIS | Final Assessment</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TDIS | Deterrence Audit</title>
     <style>
-        body {
-            background-color: #020802;
-            color: #00ff41;
-            font-family: 'Courier New', Courier, monospace;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            overflow: hidden;
-        }
-        /* Scanline Effect */
-        body::before {
-            content: " ";
-            display: block;
-            position: absolute;
-            top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            z-index: 2;
-            background-size: 100% 2px, 3px 100%;
-            pointer-events: none;
-        }
-        #terminal {
-            width: 90%;
-            max-width: 700px;
-            border: 2px solid #00ff41;
-            padding: 40px;
-            background: #050505;
-            position: relative;
-            z-index: 1;
-        }
-        .header { border-bottom: 1px solid #00ff41; margin-bottom: 20px; padding-bottom: 10px; }
-        .stats { display: flex; justify-content: space-between; font-size: 10px; text-transform: uppercase; }
-        .question-text { font-size: 1.2rem; margin-bottom: 25px; min-height: 60px; }
-        .option {
-            border: 1px solid #008f11;
-            padding: 15px;
-            margin: 10px 0;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .option:hover { background: #00ff41; color: #000; font-weight: bold; }
-        #progress { font-size: 12px; color: #008f11; margin-top: 20px; }
-        #result-screen { display: none; text-align: center; }
-        .big-score { font-size: 4rem; color: #fff; text-shadow: 0 0 20px #00ff41; margin: 20px 0; }
-        .profile-box { border: 1px dashed #00ff41; padding: 20px; margin-top: 20px; text-align: left; }
+        :root { --glow: #00ff41; --bg: #020802; }
+        body { background: var(--bg); color: var(--glow); font-family: 'Courier New', Courier, monospace; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow-x: hidden; }
+        #terminal { width: 95%; max-width: 800px; border: 1px solid var(--glow); padding: 20px; box-sizing: border-box; background: rgba(0,10,0,0.95); position: relative; box-shadow: 0 0 15px rgba(0,255,65,0.2); }
+        .header { border-bottom: 1px solid var(--glow); margin-bottom: 20px; padding-bottom: 10px; font-size: 0.8rem; display: flex; justify-content: space-between; }
+        .question-text { font-size: 1.1rem; line-height: 1.4; margin-bottom: 20px; color: #fff; }
+        .option { border: 1px solid #004411; padding: 15px; margin: 10px 0; cursor: pointer; transition: 0.2s; font-size: 0.9rem; }
+        .option:hover { background: rgba(0, 255, 65, 0.1); border-color: var(--glow); }
+        #result-screen { display: none; text-align: left; }
+        .score-box { text-align: center; border: 1px solid var(--glow); padding: 20px; margin: 20px 0; }
+        .big-score { font-size: 3.5rem; text-shadow: 0 0 10px var(--glow); margin: 10px 0; }
+        .analysis-text { line-height: 1.6; font-size: 0.95rem; color: #aaffaa; }
+        .character-tag { color: #fff; font-weight: bold; background: #004411; padding: 2px 8px; border-radius: 3px; }
+        @media (max-width: 600px) { .big-score { font-size: 2.5rem; } .question-text { font-size: 1rem; } }
     </style>
 </head>
 <body>
 
 <div id="terminal">
     <div class="header">
-        <div class="stats">
-            <span>Auth: Sophon-1</span>
-            <span>Mode: Deterrence_Audit</span>
-            <span id="timer">COORD: 41.5N, 2.3W</span>
-        </div>
-        <h2 style="letter-spacing: 3px;">SWORDHOLDER CANDIDATE EVALUATION</h2>
+        <span>SOPHON_LINK_V3.1</span>
+        <span id="progress">LOG: 1/16</span>
     </div>
 
     <div id="quiz-ui">
-        <div id="progress">LOGGING NEURAL DATA... [0/15]</div>
         <p class="question-text" id="q-text"></p>
         <div id="options-container"></div>
     </div>
 
     <div id="result-screen">
-        <div>ANALYSIS COMPLETE: DETERRENCE PROBABILITY</div>
-        <div class="big-score" id="score-display">0%</div>
-        <div class="profile-box">
-            <h3 id="profile-name"></h3>
-            <p id="profile-desc" style="font-size: 14px; color: #aaffaa;"></p>
+        <div class="score-box">
+            <div>DETERRENCE PROBABILITY</div>
+            <div class="big-score" id="score-display">0.00%</div>
+            <div id="profile-title" style="font-weight:bold; letter-spacing:2px;"></div>
         </div>
+        <div class="analysis-text" id="analysis-content"></div>
         <br>
-        <button onclick="location.reload()" style="background:transparent; color:#00ff41; border:1px solid #00ff41; padding:10px; cursor:pointer;">RE-RUN SIMULATION</button>
+        <button onclick="location.reload()" style="background:transparent; color:var(--glow); border:1px solid var(--glow); padding:10px; width:100%; cursor:pointer;">RE-AUDIT NEURAL AXIOMS</button>
     </div>
 </div>
 
 <script>
     const bank = [
-        { q: "A stranger offers a button: $1M for you, but a random star 1000LY away explodes. You:", a: [{t:"Refuse.", r:1, l:2, e:9}, {t:"Press it.", r:8, l:5, e:2}, {t:"Press it twice.", r:10, l:8, e:0}] },
-        { q: "Is 'mercy' a virtue or a strategic tool?", a: [{t:"A human virtue.", r:1, l:1, e:10}, {t:"A psychological tool.", r:7, l:9, e:2}, {t:"A fatal weakness.", r:10, l:5, e:0}] },
-        { q: "How do you view the 'End of the World'?", a: [{t:"A cosmic reset.", r:6, l:9, e:1}, {t:"A tragic loss of life.", r:1, l:2, e:10}, {t:"An abstract math problem.", r:5, l:6, e:4}] },
-        { q: "A predator hunts you. One bullet left. Target?", a: [{t:"The predator.", r:5, l:6, e:4}, {t:"A fuel tank (Kill both).", r:10, l:9, e:0}, {t:"Yourself.", r:1, l:2, e:8}] },
-        { q: "Save 5 children or 1 engineer who can fix the air?", a: [{t:"The children.", r:1, l:1, e:10}, {t:"The engineer.", r:9, l:10, e:0}, {t:"Abstain from choosing.", r:0, l:0, e:5}] },
-        { q: "What is the best way to keep a secret?", a: [{t:"Trust.", r:1, l:1, e:8}, {t:"Encryption.", r:4, l:8, e:2}, {t:"Eliminate those who know.", r:10, l:10, e:0}] },
-        { q: "The Universe is...", a: [{t:"A grand design.", r:1, l:1, e:9}, {t:"An empty void.", r:5, l:7, e:3}, {t:"A Dark Forest.", r:9, l:10, e:0}] },
-        { q: "You've held the switch for 50 years. You feel:", a: [{t:"Duty to humanity.", r:2, l:3, e:9}, {t:"Nothing.", r:9, l:9, e:1}, {t:"Resentment.", r:7, l:5, e:3}] },
-        { q: "Lose with honor or survive by any means?", a: [{t:"Honor.", r:1, l:1, e:9}, {t:"Survival.", r:9, l:10, e:0}, {t:"Unsure.", r:3, l:4, e:5}] },
-        { q: "An ant is on a map. If it crosses a line, a city is bombed. You:", a: [{t:"Move the map.", r:2, l:4, e:8}, {t:"Kill the ant.", r:9, l:8, e:1}, {t:"Wait and see.", r:5, l:5, e:5}] },
-        { q: "Your greatest enemy has 1% chance to end Earth. You can kill them by destroying 10% of Earth. You:", a: [{t:"Take the 1% risk.", r:1, l:3, e:10}, {t:"Destroy the 10%.", r:10, l:9, e:0}, {t:"Negotiate.", r:4, l:2, e:7}] },
-        { q: "If you die saving Earth but no one ever knows, you feel:", a: [{t:"Peaceful.", r:2, l:5, e:8}, {t:"It's just a trade.", r:8, l:10, e:1}, {t:"Cheated.", r:5, l:4, e:4}] },
-        { q: "The night sky makes you feel:", a: [{t:"Wonder.", r:1, l:1, e:10}, {t:"Dread.", r:7, l:6, e:3}, {t:"Alert.", r:9, l:10, e:1}] },
-        { q: "Flipping a chess table to force a draw (death of both):", a: [{t:"Dishonorable.", r:1, l:2, e:9}, {t:"Rational play.", r:10, l:10, e:0}, {t:"Desperate.", r:6, l:5, e:4}] },
-        { q: "Does the sun have a right to exist?", a: [{t:"Yes, it's life-giving.", r:1, l:1, e:10}, {t:"It's just a fuel source.", r:8, l:9, e:2}, {t:"It's a lighthouse in the dark.", r:9, l:10, e:0}] }
+        { q: "If you die saving the world but no one ever knows you were the savior, the erasure of your identity is:", a: [{t:"A non-factor; the trade is logically sound.", r:10, l:10, e:1}, {t:"A necessary price for internal peace.", r:5, l:6, e:6}, {t:"A tragic loss of human value.", r:1, l:2, e:10}] },
+        { q: "To ensure a message is understood across a chaotic, hostile channel, you:", a: [{t:"Increase redundancy and repetition.", r:3, l:4, e:8}, {t:"Strip it to bare mathematical constants.", r:9, l:10, e:1}, {t:"Encrypt it for a specific recipient.", r:6, l:7, e:3}] },
+        { q: "You observe a stable system. Your sensors might be altering it. You:", a: [{t:"Accept distorted data as the only reality.", r:8, l:9, e:1}, {t:"Withdraw and rely on theoretical models.", r:5, l:10, e:2}, {t:"Increase sensitivity to compensate.", r:2, l:3, e:9}] },
+        { q: "Localized entropy reversal saves a species but accelerates the universe's death. You:", a: [{t:"Allow the species to die; the timeline is absolute.", r:10, l:10, e:0}, {t:"Save the species; the immediate local value is higher.", r:1, l:2, e:10}, {t:"Delay the choice until the very last second.", r:5, l:5, e:5}] },
+        { q: "You are archiving humanity for a billion years. Space is limited. You prioritize:", a: [{t:"Universal physical laws and logic.", r:8, l:10, e:1}, {t:"Biological DNA sequences.", r:5, l:6, e:5}, {t:"A high-fidelity recording of a human heart.", r:1, l:1, e:10}] },
+        { q: "A weapon sits between you and a stranger. The stranger claims peace. The stable state is:", a: [{t:"Destroying the weapon, regardless of risk.", r:3, l:2, e:10}, {t:"Securing the weapon immediately.", r:10, l:9, e:1}, {t:"Both keeping hands visible and away.", r:5, l:5, e:6}] },
+        { q: "A long-term partner betrays you once after a thousand rounds. You:", a: [{t:"Terminate the partnership; trust is now zero.", r:10, l:8, e:1}, {t:"Defect in the next round as a fixed cost.", r:7, l:9, e:3}, {t:"Forgive them to maintain future benefit.", r:1, l:2, e:10}] },
+        { q: "Is a system safer when its defenses are visible or speculative?", a: [{t:"Visible; certainty prevents miscalculation.", r:6, l:10, e:2}, {t:"Hidden; the unknown creates a wider buffer.", r:10, l:7, e:3}, {t:"A visible shell with a hidden core.", r:8, l:8, e:4}] },
+        { q: "To stop pressure from a competitor, you apply:", a: [{t:"Double the pressure (Exponential).", r:8, l:8, e:3}, {t:"A final response to remove their capacity.", r:10, l:10, e:0}, {t:"A matching pressure (Linear).", r:4, l:5, e:8}] },
+        { q: "An organization is functional but entirely automated. Has it lost its 'purpose'?", a: [{t:"Never; the purpose is the output.", r:9, l:10, e:0}, {t:"The moment the first human was replaced.", r:1, l:1, e:10}, {t:"The moment the last human was replaced.", r:5, l:6, e:4}] },
+        { q: "A flaw will cause slow collapse in 500 years. You:", a: [{t:"Force a controlled collapse and rebuild now.", r:10, l:9, e:1}, {t:"Attempt a temporary patch.", r:3, l:4, e:8}, {t:"Ignore it and maximize current life quality.", r:1, l:2, e:10}] },
+        { q: "To maintain order, you must tell a lie that requires ten more lies. You:", a: [{t:"Tell the lies; systemic stability is paramount.", r:8, l:9, e:2}, {t:"Admit the lie and accept the chaos.", r:3, l:5, e:7}, {t:"Construct a larger truth to hide the lie.", r:6, l:7, e:4}] },
+        { q: "In high-stakes calculation, you prefer:", a: [{t:"A 1% chance of total catastrophe.", r:1, l:2, e:10}, {t:"A 100% chance of a manageable failure.", r:10, l:10, e:1}, {t:"A 50% chance of an unknown outcome.", r:5, l:6, e:5}] },
+        { q: "In terminal conflict, 'winning' is defined as:", a: [{t:"Ensuring the opponent ceases to exist.", r:10, l:9, e:0}, {t:"Surviving in any unrecognizable form.", r:8, l:10, e:1}, {t:"Surviving with your identity intact.", r:1, l:1, e:10}] },
+        { q: "You see your current path leads to a logical failure. You:", a: [{t:"Change paths, even if the new one is unmapped.", r:9, l:8, e:2}, {t:"Stay the course and find a workaround.", r:5, l:6, e:5}, {t:"Accept failure as the logical conclusion.", r:3, l:10, e:4}] },
+        { q: "One minute to speak to the world before eternal silence. You:", a: [{t:"State a final, undeniable universal truth.", r:8, l:10, e:1}, {t:"Offer words of comfort and hope.", r:1, l:1, e:10}, {t:"Say nothing; silence is the only honesty.", r:10, l:8, e:2}] }
     ];
 
     let current = 0, R = 0, L = 0, E = 0;
 
     function nextQ() {
         if(current >= bank.length) return finish();
-        document.getElementById('progress').innerText = `LOGGING NEURAL DATA... [${current+1}/15]`;
+        document.getElementById('progress').innerText = `LOG: ${current+1}/16`;
         const data = bank[current];
-        document.getElementById('q-text').innerText = `> ${data.q}`;
+        document.getElementById('q-text').innerText = data.q;
         const container = document.getElementById('options-container');
         container.innerHTML = "";
         data.a.sort(()=>Math.random()-0.5).forEach(opt => {
@@ -122,22 +86,55 @@
     function finish() {
         document.getElementById('quiz-ui').style.display = "none";
         document.getElementById('result-screen').style.display = "block";
-        let score = Math.min(99.99, ((R * L) / (E + 1)) * 0.9);
+        let score = Math.min(100, (((R * L)**2) / ((E + 1) * 230))); // Adjusted normalization
+        if(R > 140 && L > 140 && E < 10) score = 100; // Force 100 for perfect ruthless logic
         document.getElementById('score-display').innerText = score.toFixed(2) + "%";
         
         let pName = "", pDesc = "";
-        if(score > 88) {
-            pName = "PROFILE: THE WALLFACER (LUO JI)";
-            pDesc = "Trisolaran Analysis: EXTREME THREAT. You have achieved 'Cosmic Sociopathy.' Your willingness to trigger mutual destruction is a mathematical constant. The Trisolarans will not move. You are a monster to humans, but a savior to the species.";
-        } else if (score > 40) {
-            pName = "PROFILE: THE LOGICIAN (THOMAS WADE)";
-            pDesc = "Trisolaran Analysis: ANOMALY DETECTED. You possess the ruthlessness to advance, but your lack of isolation makes you vulnerable to assassination. They fear you, but they will actively plot to ensure you never hold the switch.";
+        
+        if(score === 100) {
+            pName = "AXIOM: THE PERFECT SWORD";
+            pDesc = "You are <span class='character-tag'>THOMAS WADE</span>. Rationality: Absolute. Brutality: Total. Sensibility: Null. You do not carry the sword; you are the blade itself. You view humanity not as a family, but as a biological variable that must persist at any cost. Trisolarans calculate your deterrence at 100% because they know you don't just 'threaten' destruction—you have already accepted it. They will never attack, but they will fear you more than death. You will save the world, and the world will rightfully hate you for it.";
+        } else if (score > 98.5) {
+            pName = "AXIOM: SINGULARITY";
+            pDesc = "A near-perfect logical engine. You have achieved a state of 'Cosmic Realism' where individual life is noise. You are more machine than man.";
+        } else if (score >= 90) {
+            pName = "AXIOM: THE SWORDHOLDER";
+            pDesc = "You are <span class='character-tag'>LUO JI</span>. You have found the balance between human sensibility and the cold logic of the Dark Forest. You are the 'Monster' Earth needs. People will fear you and treat you as a god/pariah, but you are the only one capable of staring into the Sophons for 50 years without blinking. If the Droplets launch, you press the button without a second thought.";
+        } else if (score >= 80) {
+            pName = "AXIOM: THE WALLFACER";
+            pDesc = "High resolve. You are capable of extreme ruthlessness but still value the concept of 'Humanity.' You are a formidable guardian.";
+        } else if (score >= 70) {
+            pName = "AXIOM: THE STRATEGIST";
+            pDesc = "Strong rational thinking. You would be a key advisor in the PDC. You think in systems, but your 'Humanity' is still a tether.";
+        } else if (score >= 60) {
+            pName = "AXIOM: THE LOGICIAN";
+            pDesc = "A balanced mind. You understand the math, but you are still susceptible to the 'Sentiment' trap. Trisolaris views you as a manageable risk.";
+        } else if (score >= 50) {
+            pName = "AXIOM: THE EQUILIBRIUM";
+            pDesc = "Median deterrence. You are the voice of 'Reasonable Humanity.' In the TBP universe, you are the first to be compromised.";
+        } else if (score >= 40) {
+            pName = "AXIOM: THE PROTECTOR";
+            pDesc = "Sensibility begins to outweigh logic. You want to save everyone, which means you may end up saving no one.";
+        } else if (score >= 30) {
+            pName = "AXIOM: THE IDEALIST";
+            pDesc = "Your rationality is hampered by hope. You are susceptible to Trisolaran cultural 'soft power.'";
+        } else if (score >= 20) {
+            pName = "AXIOM: THE CIVILIAN";
+            pDesc = "You value the present over the future. You would be one of the millions cheering for the wrong leader in the Deterrence Era.";
+        } else if (score >= 10) {
+            pName = "AXIOM: THE CRADLE";
+            pDesc = "You are <span class='character-tag'>CHENG XIN</span>. Rationality: Low. Sensibility: Absolute. Brutality: Null. You are the embodiment of maternal love and human grace. The world will love you and vote for you because you represent their best self. However, Trisolaris calculates your deterrence at near 0. They will launch the Droplets the moment you take office, knowing your hand will never press the button. You will be remembered as the person who loved the world to death.";
+        } else if (score > 0) {
+            pName = "AXIOM: THE SACRIFICE";
+            pDesc = "Total sentimentality. You are the reason the Dark Forest is so dangerous. You provide the light that the predators use to find the nest.";
         } else {
-            pName = "PROFILE: THE CRADLE (CHENG XIN)";
-            pDesc = "Trisolaran Analysis: ZERO THREAT. You are the 'Mother' of humanity. Your compassion is a gift to Trisolaris. The Droplets are already decelerating toward Earth's transmitters. You will watch the world end while holding its hand.";
+            pName = "AXIOM: NULL";
+            pDesc = "Total emotional collapse. You do not belong in a cold universe.";
         }
-        document.getElementById('profile-name').innerText = pName;
-        document.getElementById('profile-desc').innerText = pDesc;
+
+        document.getElementById('profile-title').innerText = pName;
+        document.getElementById('analysis-content').innerHTML = pDesc;
     }
     nextQ();
 </script>
