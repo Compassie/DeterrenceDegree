@@ -4,104 +4,58 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>TDIS | Sophon Audit</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root { --glow: #00ff41; --bg: #010801; --dim: #003300; }
-        
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body, html { 
-            background: var(--bg); 
-            color: var(--glow); 
+            background: var(--bg); color: var(--glow); 
             font-family: 'Courier New', Courier, monospace; 
-            margin: 0; 
-            padding: 0;
-            width: 100vw;
-            height: 100vh;
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            overflow: hidden; /* Prevents vertical scrolling of the whole page */
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            overflow: hidden; display: flex; justify-content: center; align-items: center;
         }
         
         #terminal { 
-            width: 92%; 
-            max-width: 700px; 
-            height: 90vh; /* Keeps the frame within the device screen */
-            border: 1px solid var(--glow); 
-            padding: 20px; 
-            background: rgba(0,8,0,0.98); 
-            position: relative; 
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 0 25px rgba(0,255,65,0.15); 
-            z-index: 5; 
+            width: 94%; max-width: 700px; 
+            height: 85vh; height: 85svh; /* Dynamic viewport height to avoid browser bars */
+            border: 1px solid var(--glow); padding: 20px; 
+            background: rgba(0,8,0,0.98); position: relative; 
+            display: flex; flex-direction: column;
+            box-shadow: 0 0 25px rgba(0,255,65,0.15); z-index: 5; 
         }
 
-        /* Scanline Overlay */
         #terminal::after { 
             content: " "; position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
             background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
             z-index: 10; background-size: 100% 3px; pointer-events: none; 
         }
 
-        .header { 
-            border-bottom: 1px solid var(--glow); 
-            margin-bottom: 15px; 
-            padding-bottom: 10px; 
-            font-size: 0.7rem; 
-            display: flex; 
-            justify-content: space-between; 
-            flex-shrink: 0; 
-        }
-        
-        .screen-content {
-            flex-grow: 1;
-            overflow-y: auto; /* Allows internal scrolling for long text, but keeps frame static */
-            padding-right: 5px;
-        }
-
-        /* Custom Scrollbar for inner content */
-        .screen-content::-webkit-scrollbar { width: 4px; }
-        .screen-content::-webkit-scrollbar-thumb { background: var(--glow); }
-
+        .header { border-bottom: 1px solid var(--glow); margin-bottom: 15px; padding-bottom: 10px; font-size: 0.7rem; display: flex; justify-content: space-between; flex-shrink: 0; }
+        .screen-content { flex-grow: 1; overflow-y: auto; padding-right: 5px; -webkit-overflow-scrolling: touch; }
         .screen { display: none; height: 100%; flex-direction: column; }
         .active { display: flex; }
 
         h1 { font-size: 1.3rem; text-align: center; letter-spacing: 4px; margin: 10px 0; }
-        .guide-text { line-height: 1.5; font-size: 0.9rem; color: #aaffaa; }
-
+        .guide-text { line-height: 1.6; font-size: 0.9rem; color: #aaffaa; }
         .question-text { font-size: 1rem; line-height: 1.4; margin-bottom: 20px; color: #fff; }
         
-        .option { 
-            border: 1px solid var(--dim); 
-            padding: 12px; 
-            margin: 8px 0; 
-            cursor: pointer; 
-            transition: 0.2s; 
-            font-size: 0.85rem; 
-            background: rgba(0,30,0,0.3);
-            outline: none;
-        }
+        .option { border: 1px solid var(--dim); padding: 12px; margin: 8px 0; cursor: pointer; transition: 0.2s; font-size: 0.85rem; background: rgba(0,30,0,0.3); outline: none; }
         .option:hover { background: rgba(0, 255, 65, 0.1); border-color: var(--glow); }
 
         .score-box { text-align: center; border: 1px solid var(--glow); padding: 15px; margin-bottom: 15px; }
         .big-score { font-size: 3rem; font-weight: bold; text-shadow: 0 0 15px var(--glow); }
 
-        #interruption { 
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: #000; color: #ff0000; z-index: 100; justify-content: center; 
-            align-items: center; flex-direction: column; text-align: center; 
-        }
+        #interruption { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; color: #ff0000; z-index: 100; justify-content: center; align-items: center; flex-direction: column; text-align: center; }
         .glitch-text { font-size: 1.8rem; animation: glitch 0.2s infinite; letter-spacing: 5px; }
         @keyframes glitch { 0% { transform: translate(2px, -2px); } 50% { transform: translate(-2px, 2px); color: #fff; } 100% { transform: translate(0); } }
 
-        #certificate { border: 2px dashed var(--glow); padding: 15px; margin-top: 15px; background: #000; display: none; font-size: 0.8rem; }
+        /* Certificate Styling for Export */
+        #cert-wrap { background: #000; padding: 20px; border: 2px solid var(--glow); margin-top: 15px; display: none; }
+        #cert-wrap h3 { text-align: center; margin: 0 0 10px 0; color: var(--glow); border-bottom: 1px solid var(--glow); padding-bottom: 5px; }
+        .cert-body { font-size: 0.8rem; line-height: 1.4; color: var(--glow); }
 
-        button { 
-            background: transparent; color: var(--glow); border: 1px solid var(--glow); 
-            padding: 12px; width: 100%; cursor: pointer; font-family: 'Courier New'; 
-            margin-top: 15px; flex-shrink: 0;
-        }
+        button { background: transparent; color: var(--glow); border: 1px solid var(--glow); padding: 12px; width: 100%; cursor: pointer; font-family: 'Courier New'; margin-top: 10px; flex-shrink: 0; font-weight: bold; }
         button:hover { background: var(--glow); color: #000; }
     </style>
 </head>
@@ -110,12 +64,11 @@
 <div id="interruption">
     <div class="glitch-text">SOPHON INTERFERENCE</div>
     <p>NEURAL PATTERN HARVESTING BLOCKED</p>
-    <p style="font-size: 0.7rem;">You are attempting to optimize your deception. We see you.</p>
 </div>
 
 <div id="terminal">
     <div class="header">
-        <span>SOPHON_INTERFACE_V.4</span>
+        <span>SOPHON_INTERFACE_V.5</span>
         <span id="step-count">AXIOM_AUDIT</span>
     </div>
 
@@ -125,39 +78,40 @@
             <div class="guide-text">
                 <p>> GREETINGS, BUG.</p>
                 <p>> You seek to measure the weight of your hand on the switch. But a Swordholder is not a person; they are a mathematical constant. This audit will strip away your human pretenses to find the raw axioms beneath.</p>
-                <p>> Do not choose what you wish to be. Choose what you are when the sun begins to flicker.</p>
-                <p>> We are watching. We are everywhere.</p>
+                <p>> Do not choose what you wish to be. Choose what you are when the sun begins to flicker. We are everywhere.</p>
             </div>
         </div>
         <button onclick="startAudit()">INITIALIZE NEURAL FEED</button>
     </div>
 
     <div id="quiz-page" class="screen">
-        <div class="screen-content" id="quiz-inner">
+        <div class="screen-content">
             <p class="question-text" id="q-text"></p>
             <div id="options-container"></div>
         </div>
     </div>
 
     <div id="result-page" class="screen">
-        <div class="screen-content">
+        <div class="screen-content" id="capture-area">
             <div class="score-box">
                 <div style="font-size: 0.7rem; letter-spacing: 3px;">DETERRENCE PROBABILITY</div>
                 <div class="big-score" id="score-display">0.0%</div>
                 <div id="profile-title" style="font-weight:bold; margin-top: 10px; font-size: 0.9rem;"></div>
             </div>
-            <div id="analysis-content" style="line-height: 1.5; font-size: 0.85rem;"></div>
+            <div id="analysis-content" style="line-height: 1.5; font-size: 0.85rem; padding: 10px; border-left: 1px solid var(--glow);"></div>
             
-            <div id="certificate">
-                <h3 style="text-align:center; margin:0; font-size: 0.9rem;">NEURAL AUDIT WARNING</h3>
-                <p>ID: <span id="cert-id"></span> | THREAT: <span id="cert-threat"></span></p>
-                <p>DETERRENCE DEGREE: <span id="cert-score"></span></p>
-                <p style="font-size: 0.65rem;">[SOPHON NOTE]: decisión matrix archived. Pre-emptive measure pending.</p>
+            <div id="cert-wrap">
+                <h3>NEURAL AUDIT WARNING</h3>
+                <div class="cert-body">
+                    <p>ID: <span id="cert-id"></span></p>
+                    <p>STATUS: <span id="cert-threat"></span></p>
+                    <p>[SOPHON NOTE]: Neural matrix archived. Subject is monitored for deterrence fluctuation. Deception protocols active.</p>
+                </div>
             </div>
         </div>
         
-        <button id="cert-btn" onclick="generateCertificate()">GENERATE AUDIT CERTIFICATE</button>
-        <button onclick="resetAudit()" style="border-color: #440000; color: #880000;">RE-INITIALIZE</button>
+        <button id="download-btn" onclick="downloadImage()">DOWNLOAD AUDIT IMAGE</button>
+        <button onclick="location.reload()" style="border-color: #440000; color: #880000;">RE-INITIALIZE</button>
     </div>
 </div>
 
@@ -182,7 +136,7 @@
     ];
 
     let current = 0, R = 0, L = 0, E = 0;
-    let auditCount = parseInt(localStorage.getItem('audit_count_v4') || 0);
+    let auditCount = parseInt(localStorage.getItem('audit_count_v5') || 0);
 
     function startAudit() {
         if (auditCount >= 3) {
@@ -196,39 +150,27 @@
 
     function nextQ() {
         if(current >= bank.length) return finish();
-        
-        // Reset scroll position and clear focus to fix pre-selected effects
-        document.getElementById('quiz-inner').scrollTop = 0;
-        
         document.getElementById('step-count').innerText = `STEP: ${current+1}/16`;
         const data = bank[current];
         document.getElementById('q-text').innerText = `> ${data.q}`;
-        
         const container = document.getElementById('options-container');
         container.innerHTML = ""; 
-        
         data.a.sort(()=>Math.random()-0.5).forEach(opt => {
             let div = document.createElement('div');
             div.className = "option";
             div.innerText = opt.t;
-            div.tabIndex = -1; // Prevents focus outline on load
-            div.onclick = () => { 
-                R+=opt.r; L+=opt.l; E+=opt.e; 
-                current++; 
-                nextQ(); 
-            };
+            div.onclick = () => { R+=opt.r; L+=opt.l; E+=opt.e; current++; nextQ(); };
             container.appendChild(div);
         });
     }
 
     function finish() {
+        document.getElementById('step-count').innerText = "AUDIT_COMPLETE";
         document.getElementById('quiz-page').classList.remove('active');
         document.getElementById('result-page').classList.add('active');
         
-        // Final sensitivity logic: Empathy is a lethal divisor
-        let raw = (R + L) - (E * 2.8); 
+        let raw = (R + L) - (E * 3.0); 
         let score = (raw / 320) * 100;
-        
         if (score > 99.9 && E > 0) score = 98.4; 
         if (score > 100) score = 100;
         if (score < 0) score = 0;
@@ -239,54 +181,58 @@
 
         if (score === 100) {
             title.innerText = "AXIOM: THE PERFECT BLADE";
-            content.innerHTML = "You are <span style='background:#00ff41; color:#000; padding:2px;'>THOMAS WADE</span>. Rationality: Absolute. Sensibility: Erased. Brutality: Maximum. You have no human shadow. Trisolaris calculates your deterrence at 100% because you are the only entity that cannot be negotiated with. You will save the species, but you will destroy its soul to do so.";
+            content.innerHTML = "You are <span style='background:#00ff41; color:#000; padding:2px;'>THOMAS WADE</span>. <b>Rational Thinking:</b> Absolute/Cold. <b>Sensibility:</b> Erased. <b>Brutality:</b> Maximum. You do not carry the sword; you are the blade itself. You view humanity not as a family, but as a biological variable that must persist at any cost. Trisolarans calculate your deterrence at 100% because they know you have already accepted the end of the world. They will never attack while you breathe. Humanity will hate you for the peace you force upon them.";
         } else if (score >= 90) {
             title.innerText = "AXIOM: THE SWORDHOLDER";
-            content.innerHTML = "You are <span style='background:#00ff41; color:#000; padding:2px;'>LUO JI</span>. You carry the burden of the Dark Forest. You are the 'Monster' Earth needs. Trisolaris will not move against you. You will press the button, and they know it.";
+            content.innerHTML = "You are <span style='background:#00ff41; color:#000; padding:2px;'>LUO JI (Late Era)</span>. <b>Rationality:</b> 95%. <b>Sensibility:</b> Suppressed. <b>Brutality:</b> Strategic. You have balanced your humanity with the cold logic of the Dark Forest. You are the perfect Swordholder—staring into the void for 50 years without blinking. Trisolaris views you with genuine terror. You will press the button, and they know it. You hold the life of two worlds in a steady hand.";
         } else if (score >= 80) {
             title.innerText = "AXIOM: THE WALLFACER";
-            content.innerHTML = "High strategic ruthlessness. You prioritize the species over the individual. Most of humanity would find your decisions terrifying, but your logic is the only thing keeping the sun from going dark.";
+            content.innerHTML = "You are a master of strategic ruthlessness. You are resolute, relentless, and possess the psychological fortitude to maintain a global threat for decades. You prioritize the species over the individual. Most of humanity would find your decisions terrifying, but your logic is the only thing keeping the sun from going dark. Trisolaris considers you a high-priority threat.";
         } else if (score >= 70) {
             title.innerText = "AXIOM: THE IRON ADVISOR";
-            content.innerHTML = "Highly rational and strict. You possess the brutality to make hard calls, but you still possess a trace of 'Human Noise' that prevents total deterrence.";
+            content.innerHTML = "Highly rational and strict. You possess the brutality to make hard calls, but you still possess a trace of 'Human Noise' that prevents total deterrence. You are the structural steel of a civilization, ensuring that laws and systems operate with maximum efficiency even in times of collapse. Trisolaris watches you for signs of fatigue or emotional compromise.";
         } else if (score >= 60) {
             title.innerText = "AXIOM: THE LOGICIAN";
-            content.innerHTML = "Rationality outweighs sensibility. You are straightforward and relentless. However, you lack the 'Brutish' instinct required for the ultimate stalemate.";
+            content.innerHTML = "Rationality outweighs sensibility. You are straightforward and relentless in pursuit of a goal. However, you lack the 'Brutish' instinct required for the ultimate stalemate. You are an excellent engineer of systems, but you may hesitate when the calculation requires your own total destruction. Your deterrence is reliable but not absolute.";
         } else if (score >= 50) {
             title.innerText = "AXIOM: THE EQUILIBRIUM";
-            content.innerHTML = "A median mind. You are rational but plagued by a sense of fairness. In this universe, 'Fairness' is a fatal flaw. You are easily predicted by the Sophons.";
+            content.innerHTML = "A median mind. You are rational but plagued by a sense of fairness and proportion. In the Three-Body universe, 'Fairness' is a fatal flaw that leads to hesitation. You are easily predicted by the Sophons because your logic is still bound by the laws of social ethics. You are a stable leader in times of peace, but a variable in times of war.";
         } else if (score >= 40) {
             title.innerText = "AXIOM: THE GUARDIAN";
-            content.innerHTML = "Sensibility is rising. You are resolute in your morals, but your 'Strictness' is targeted toward preserving peace rather than enforcing deterrence.";
+            content.innerHTML = "Sensibility begins to outweigh cold logic. You are resolute in your morals, but your 'Strictness' is targeted toward preserving peace rather than enforcing the brutal mechanism of deterrence. You seek a way out of the Dark Forest without firing a shot—a noble pursuit that the Trisolarans find highly exploitable. You are a protector who may accidentally leave the gates open.";
         } else if (score >= 30) {
             title.innerText = "AXIOM: THE IDEALIST";
-            content.innerHTML = "Relentless in your hope, but weak in your ruthlessness. You are susceptible to Trisolaran 'soft power' and cultural manipulation.";
+            content.innerHTML = "Relentless in your hope, but dangerously weak in your ruthlessness. You are susceptible to Trisolaran 'soft power' and cultural manipulation. You believe in a universe that rewards virtue, but the Sophons only calculate probability. You would likely be the first to suggest a ceasefire that results in total betrayal by the adversary.";
         } else if (score >= 20) {
             title.innerText = "AXIOM: THE HUMANIST";
-            content.innerHTML = "You prioritize the emotional state of the present over the survival of the future. You are a civilian leader, not a Swordholder.";
+            content.innerHTML = "You prioritize the emotional state of the present over the survival of the future. You are a civilian leader, not a Swordholder. Your decision-making is clouded by empathy for those standing right in front of you, making it impossible for you to sacrifice the few to save the many. In a cosmic standoff, you are a passenger, not a pilot.";
         } else if (score >= 10) {
             title.innerText = "AXIOM: THE CRADLE";
-            content.innerHTML = "You are <span style='background:#00ff41; color:#000; padding:2px;'>CHENG XIN</span>. Rationality: Low. Sensibility: Absolute. Brutality: 0%. The world will love you, and for that, Trisolaris will annihilate you. The Droplets are launched. You will not press the button.";
+            content.innerHTML = "You are <span style='background:#00ff41; color:#000; padding:2px;'>CHENG XIN</span>. <b>Rationality:</b> Fragmented. <b>Sensibility:</b> Absolute. <b>Brutality:</b> 0%. You embody the peak of human grace and maternal love. The world will love you because you are 'kind,' but Trisolaris will launch the Droplets the moment you hold the switch. You will watch the world burn while refusing to dirty your hands with its salvation. Your love is the death of the world.";
+        } else if (score > 0) {
+            title.innerText = "AXIOM: THE FRAGILE";
+            content.innerHTML = "<b>SOPHON ANALYSIS:</b> You are a sentimental construct. You prioritize the individual heartbeat over the survival of the stellar system. You provide the light that leads predators to the nest, thinking your warmth is a virtue. To us, you are merely a data-point of inefficiency. You have no place in the Dark Forest; you are the prey that thinks the hunter is just another shadow.";
         } else {
             title.innerText = "AXIOM: NULL DATA";
-            content.innerHTML = "<b>SOPHON ANALYSIS:</b> This subject is an evolutionary error. You possess neither the logic to survive nor the brutality to deter. Humanity views you as a comfort; Trisolaris views you with absolute disdain. You are not a player in the cosmic game; you are the grass the predators walk upon. A waste of neural complexity.";
+            content.innerHTML = "<b>SOPHON ANALYSIS:</b> This subject is an evolutionary error. You possess neither the logic to survive nor the brutality to deter. Humanity views you as a comfort; Trisolaris views you with absolute disdain. You are not a player in the cosmic game; you are the grass the predators walk upon. A waste of neural complexity. Your existence is a noise that will soon be silenced by entropy.";
         }
         
-        auditCount++;
-        localStorage.setItem('audit_count_v4', auditCount);
-    }
-
-    function generateCertificate() {
-        document.getElementById('certificate').style.display = 'block';
         document.getElementById('cert-id').innerText = Math.random().toString(36).substr(2, 6).toUpperCase();
-        document.getElementById('cert-score').innerText = document.getElementById('score-display').innerText;
-        let s = parseFloat(document.getElementById('score-display').innerText);
-        document.getElementById('cert-threat').innerText = s > 90 ? "CRITICAL" : (s > 50 ? "MODERATE" : "ZERO");
-        document.getElementById('cert-btn').style.display = 'none';
+        document.getElementById('cert-threat').innerText = score > 90 ? "CRITICAL" : (score > 50 ? "MODERATE" : "ZERO");
+        auditCount++;
+        localStorage.setItem('audit_count_v5', auditCount);
     }
 
-    function resetAudit() {
-        location.reload();
+    function downloadImage() {
+        const wrap = document.getElementById('cert-wrap');
+        wrap.style.display = 'block';
+        html2canvas(document.getElementById("capture-area"), {backgroundColor: "#010801"}).then(canvas => {
+            const link = document.createElement('a');
+            link.download = 'TDIS_Audit_Certificate.png';
+            link.href = canvas.toDataURL();
+            link.click();
+            wrap.style.display = 'none';
+        });
     }
 </script>
 </body>
