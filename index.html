@@ -44,38 +44,37 @@
             cursor: pointer; transition: 0.1s; font-size: 0.85rem; 
             background: rgba(0,30,0,0.3); user-select: none;
         }
-        /* UI FIX: Only shows hover/active state when the element is actually targeted */
         .option:hover { background: rgba(0, 255, 65, 0.15); border-color: var(--glow); }
         .option:active { background: var(--glow) !important; color: #000 !important; }
 
         .score-box { text-align: center; border: 1px solid var(--glow); padding: 15px; margin-bottom: 15px; }
         .big-score { font-size: 3rem; font-weight: bold; text-shadow: 0 0 15px var(--glow); }
 
-        #interruption { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; color: var(--warn); z-index: 100; justify-content: center; align-items: center; flex-direction: column; text-align: center; }
-        .glitch-text { font-size: 1.8rem; animation: glitch 0.2s infinite; }
-        @keyframes glitch { 0% { transform: translate(2px, -2px); } 50% { transform: translate(-2px, 2px); color: #fff; } 100% { transform: translate(0); } }
+        .glitch { animation: glitch 1s linear infinite; position: relative; color: var(--warn); font-weight: bold; }
+        @keyframes glitch {
+            2%, 64% { transform: translate(2px,0) skew(0deg); }
+            4%, 60% { transform: translate(-2px,0) skew(0deg); }
+            62% { transform: translate(0,0) skew(5deg); }
+        }
 
         #certificate { border: 2px dashed var(--glow); padding: 15px; margin-top: 15px; background: #000; display: none; font-size: 0.8rem; }
         button { background: transparent; color: var(--glow); border: 1px solid var(--glow); padding: 12px; width: 100%; cursor: pointer; font-family: 'Courier New'; margin-top: 10px; font-weight: bold; }
         button:hover { background: var(--glow); color: #000; }
-        .retest-btn { border-color: var(--warn); color: var(--warn); margin-top: 15px; }
 
-        /* V8 STYLE EXPORT LAYOUT */
+        /* FIXED WALLPAPER SIZE (9:16) */
         #export-container { 
-            position: absolute; left: -9999px; top: 0; width: 600px; padding: 40px; 
-            background: #010801; border: 2px solid #00ff41; color: #00ff41; 
+            position: absolute; left: -9999px; top: 0; 
+            width: 540px; height: 960px; 
+            padding: 60px 45px; background: #010801; 
+            border: 4px solid #00ff41; color: #00ff41; 
+            display: flex; flex-direction: column; justify-content: space-between;
         }
     </style>
 </head>
 <body>
 
-<div id="interruption">
-    <div class="glitch-text">SOPHON INTERFERENCE</div>
-    <p>NEURAL PATTERN HARVESTING BLOCKED</p>
-</div>
-
 <div id="terminal">
-    <div class="header"><span>SOPHON_INTERFACE_V.14</span><span id="step-count">AXIOM_AUDIT</span></div>
+    <div class="header"><span>SOPHON_INTERFACE_V.16</span><span id="step-count">AXIOM_AUDIT</span></div>
 
     <div id="start-page" class="screen active">
         <div class="screen-content">
@@ -84,6 +83,7 @@
                 <p>> GREETINGS, BUG.</p>
                 <p>> You seek to measure the weight of your hand on the switch. But a Swordholder is not a person; they are a mathematical constant. This audit will strip away your human pretenses to find the raw axioms beneath.</p>
                 <p>> Do not choose what you wish to be. Choose what you are when the sun begins to flicker.</p>
+                <p class="glitch" title="WE ARE WATCHING, WE ARE EVERYWHERE.">WE ARE WATCHING, WE ARE EVERYWHERE.</p>
             </div>
         </div>
         <button onclick="startAudit()">INITIALIZE NEURAL FEED</button>
@@ -107,21 +107,22 @@
                 <p id="cert-warning-text" style="font-size: 0.7rem; font-style: italic; border-top: 1px solid var(--glow); padding-top: 10px;"></p>
                 <button onclick="downloadImage()">SAVE AUDIT RECORD (PNG)</button>
             </div>
-            <button class="retest-btn" onclick="location.reload()">RE-INITIALIZE AUDIT</button>
+            <button class="retest-btn" style="border-color:var(--warn); color:var(--warn);" onclick="location.reload()">RE-INITIALIZE AUDIT</button>
         </div>
     </div>
 </div>
 
 <div id="export-container">
-    <div style="border: 1px solid #00ff41; padding: 20px;">
-        <div style="font-size: 0.8rem; border-bottom: 1px solid #00ff41; padding-bottom: 10px; margin-bottom: 20px;">SOPHON NEURAL AUDIT | ID: <span id="export-id"></span></div>
-        <div style="text-align: center; font-size: 4rem; font-weight: bold; margin: 10px 0;" id="export-score"></div>
-        <div id="export-title" style="text-align: center; font-weight: bold; font-size: 1.2rem; margin-bottom: 20px;"></div>
-        <div id="export-content" style="line-height: 1.6; border-left: 3px solid #00ff41; padding-left: 15px; margin-bottom: 30px;"></div>
-        <div style="font-size: 0.75rem; border-top: 1px dashed #00ff41; padding-top: 15px;">
-            <div>STATUS: <span id="export-threat"></span></div>
-            <div id="export-warning-text" style="margin-top: 10px; font-style: italic;"></div>
-        </div>
+    <div>
+        <div style="font-size: 0.9rem; border-bottom: 2px solid #00ff41; padding-bottom: 10px; margin-bottom: 40px; letter-spacing: 2px;">SOPHON NEURAL AUDIT | ID: <span id="export-id"></span></div>
+        <div style="text-align: center; font-size: 5rem; font-weight: bold; margin: 10px 0;" id="export-score"></div>
+        <div id="export-title" style="text-align: center; font-weight: bold; font-size: 1.5rem; margin-bottom: 30px; letter-spacing: 2px;"></div>
+        <div id="export-content" style="line-height: 1.7; border-left: 4px solid #00ff41; padding-left: 20px; font-size: 1.1rem; margin-bottom: 40px;"></div>
+    </div>
+    <div style="font-size: 0.9rem; border: 1px dashed #00ff41; padding: 20px; background: rgba(0,255,65,0.05);">
+        <div style="font-weight: bold; margin-bottom: 10px;">THREAT LEVEL: <span id="export-threat"></span></div>
+        <div id="export-warning-text" style="font-style: italic; opacity: 0.8; font-size: 0.85rem;"></div>
+        <div style="margin-top: 20px; font-size: 0.7rem; text-align: right; letter-spacing: 1px; color: #ff0000;">WE ARE WATCHING.</div>
     </div>
 </div>
 
@@ -146,10 +147,8 @@
     ];
 
     let current = 0, R = 0, L = 0, E = 0;
-    let auditCount = parseInt(localStorage.getItem('audit_count_v14') || 0);
 
     function startAudit() {
-        if (auditCount >= 3) { document.getElementById('interruption').style.display = 'flex'; return; }
         document.getElementById('start-page').classList.remove('active');
         document.getElementById('quiz-page').classList.add('active');
         nextQ();
@@ -157,31 +156,18 @@
 
     function nextQ() {
         if(current >= bank.length) return finish();
-        
-        // UI FIX: Physical removal of focus and timing delay
         document.activeElement.blur();
         window.getSelection().removeAllRanges();
-        
         const container = document.getElementById('options-container');
-        container.style.pointerEvents = "none";
         container.innerHTML = ""; 
-
-        // Wait for next frame to ensure UI is blanked before repopulating
         requestAnimationFrame(() => {
             document.getElementById('step-count').innerText = `STEP: ${current+1}/16`;
             const data = bank[current];
             document.getElementById('q-text').innerText = `> ${data.q}`;
-            
             data.a.sort(()=>Math.random()-0.5).forEach(opt => {
                 let div = document.createElement('div');
-                div.className = "option";
-                div.innerText = opt.t;
-                div.onclick = () => { 
-                    container.style.pointerEvents = "none";
-                    R+=opt.r; L+=opt.l; E+=opt.e; 
-                    current++; 
-                    setTimeout(nextQ, 60); 
-                };
+                div.className = "option"; div.innerText = opt.t;
+                div.onclick = () => { container.style.pointerEvents = "none"; R+=opt.r; L+=opt.l; E+=opt.e; current++; setTimeout(nextQ, 60); };
                 container.appendChild(div);
             });
             container.style.pointerEvents = "auto";
@@ -189,16 +175,12 @@
     }
 
     function finish() {
-        document.getElementById('step-count').style.display = 'none';
         document.getElementById('quiz-page').classList.remove('active');
         document.getElementById('result-page').classList.add('active');
-        
         let raw = (R + L) - (E * 3.0); 
         let score = (raw / 320) * 100;
         if (score > 99.9 && E > 0) score = 98.4; 
-        if (score > 100) score = 100;
-        if (score < 0) score = 0;
-
+        if (score > 100) score = 100; if (score < 0) score = 0;
         const scoreDisp = score.toFixed(1) + "%";
         document.getElementById('score-display').innerText = scoreDisp;
         const title = document.getElementById('profile-title');
@@ -231,42 +213,23 @@
         } else if (score >= 20) {
             title.innerText = "AXIOM: THE HUMANIST";
             content.innerText = "You prioritize the emotional state of the present over the survival of the future. Your decision-making is clouded by empathy, making it impossible for you to sacrifice the few to save the many. In a cosmic standoff, you are a passenger, not a pilot.";
-        } else if (score >= 10) {
-            // V8 REVERSION
-            title.innerText = "AXIOM: THE CRADLE";
-            content.innerText = "You are CHENG XIN. Rationality: Fragmented. Sensibility: Absolute. Brutality: 0%. You embody the peak of human grace and maternal love. The world will love you because you are \"kind,\" but the adversary will strike the moment you hold the switch. You will watch the world burn while refusing to dirty your hands with its salvation.";
+        } else if (score > 0) {
+            title.innerText = "AXIOM: THE FRAGILE";
+            content.innerText = "SOPHON ANALYSIS: You are a sentimental construct. You prioritize the individual heartbeat over the survival of the stellar system. You provide the light that leads predators to the nest, thinking your warmth is a virtue. To us, you are merely a data-point of inefficiency. You have no place in the Dark Forest; you are the prey that thinks the hunter is just another shadow.";
         } else {
-            // V8 REVERSION
-            title.innerText = "AXIOM: THE FRAGILE / NULL DATA";
-            content.innerText = "You are a sentimental construct. You provide the light that leads predators to the nest, thinking your warmth is a virtue. You are not a player in the cosmic game; you are the grass the predators walk upon. Your existence is a noise that will soon be silenced by entropy.";
+            title.innerText = "AXIOM: NULL DATA";
+            content.innerText = "SOPHON ANALYSIS: This subject is an evolutionary error. You possess neither the logic to survive nor the brutality to deter. Humanity views you as a comfort; Trisolaris views you with absolute disdain. You are not a player in the cosmic game; you are the grass the predators walk upon. A waste of neural complexity. Your existence is a noise that will soon be silenced by entropy.";
         }
-        
-        auditCount++;
-        localStorage.setItem('audit_count_v14', auditCount);
     }
 
     function generateCertificate() {
         const id = Math.random().toString(36).substr(2, 6).toUpperCase();
         const scoreVal = parseFloat(document.getElementById('score-display').innerText);
         const scoreStr = scoreVal.toFixed(1) + "%";
-        
         let threat, warning;
-        if (scoreVal >= 90) {
-            threat = "CRITICAL / INVASION HALTED";
-            warning = "[SOPHON WARNING]: Subject is a perfect mirror of the Dark Forest. Probability of total mutual destruction is 100%. The fleet must maintain a distance of 1.2 light-years.";
-        } else if (scoreVal >= 70) {
-            threat = "HIGH / STRATEGIC STALEMATE";
-            warning = "[SOPHON WARNING]: Subject possesses the resolve to execute the final signal. Invasion risk exceeds acceptable loss parameters.";
-        } else if (scoreVal >= 40) {
-            threat = "MODERATE / PROBING AUTHORIZED";
-            warning = "[SOPHON WARNING]: Deterrence is unstable. Probability of hesitation during a first-strike scenario is 45%. Deployment of Droplets authorized.";
-        } else if (scoreVal >= 10) {
-            threat = "LOW / INVASION WINDOW OPEN";
-            warning = "[SOPHON WARNING]: Subject's deterrence is a facade. Commitment to 'life' makes them incapable of destroying it. First-strike success probability: 98.2%.";
-        } else {
-            threat = "NULL / TOTAL EXTINCTION AUTHORIZED";
-            warning = "[SOPHON WARNING]: There is no Swordholder. The switch is held by a child. Initiate the 'Australia Migration' protocol immediately.";
-        }
+        if (scoreVal >= 90) { threat = "CRITICAL / INVASION HALTED"; warning = "[SOPHON WARNING]: Subject is a perfect mirror of the Dark Forest. Probability of total mutual destruction is 100%."; }
+        else if (scoreVal >= 40) { threat = "MODERATE / PROBING AUTHORIZED"; warning = "[SOPHON WARNING]: Deterrence is unstable. Probability of hesitation is high."; }
+        else { threat = "NULL / TOTAL EXTINCTION AUTHORIZED"; warning = "[SOPHON WARNING]: There is no Swordholder. Initiate the 'Australia Migration' protocol immediately."; }
 
         document.getElementById('cert-id').innerText = id;
         document.getElementById('cert-threat').innerText = threat;
@@ -275,7 +238,6 @@
         document.getElementById('certificate').style.display = 'block';
         document.getElementById('cert-btn').style.display = 'none';
 
-        // V8 STYLE EXPORT POPULATION
         document.getElementById('export-id').innerText = id;
         document.getElementById('export-threat').innerText = threat;
         document.getElementById('export-score').innerText = scoreStr;
@@ -285,11 +247,10 @@
     }
 
     function downloadImage() {
-        html2canvas(document.getElementById("export-container")).then(canvas => {
+        html2canvas(document.getElementById("export-container"), { scale: 2 }).then(canvas => {
             const link = document.createElement('a');
-            link.download = `SOPHON_AUDIT_${document.getElementById('cert-id').innerText}.png`;
-            link.href = canvas.toDataURL();
-            link.click();
+            link.download = `TDIS_WALLPAPER_${document.getElementById('cert-id').innerText}.png`;
+            link.href = canvas.toDataURL(); link.click();
         });
     }
 </script>
