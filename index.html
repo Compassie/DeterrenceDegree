@@ -39,12 +39,12 @@
         .guide-text { line-height: 1.6; font-size: 0.9rem; color: #aaffaa; }
         .question-text { font-size: 1rem; line-height: 1.4; margin-bottom: 20px; color: #fff; }
         
-        /* FIX: Ensure no persistent styling */
         .option { 
             border: 1px solid var(--dim); padding: 12px; margin: 8px 0; 
             cursor: pointer; transition: 0.1s; font-size: 0.85rem; 
             background: rgba(0,30,0,0.3); user-select: none;
         }
+        /* UI FIX: Only shows hover/active state when the element is actually targeted */
         .option:hover { background: rgba(0, 255, 65, 0.15); border-color: var(--glow); }
         .option:active { background: var(--glow) !important; color: #000 !important; }
 
@@ -60,7 +60,11 @@
         button:hover { background: var(--glow); color: #000; }
         .retest-btn { border-color: var(--warn); color: var(--warn); margin-top: 15px; }
 
-        #export-container { position: absolute; left: -9999px; top: 0; width: 600px; padding: 40px; background: #010801; border: 10px solid #00ff41; color: #00ff41; }
+        /* V8 STYLE EXPORT LAYOUT */
+        #export-container { 
+            position: absolute; left: -9999px; top: 0; width: 600px; padding: 40px; 
+            background: #010801; border: 2px solid #00ff41; color: #00ff41; 
+        }
     </style>
 </head>
 <body>
@@ -71,7 +75,7 @@
 </div>
 
 <div id="terminal">
-    <div class="header"><span>SOPHON_INTERFACE_V.13</span><span id="step-count">AXIOM_AUDIT</span></div>
+    <div class="header"><span>SOPHON_INTERFACE_V.14</span><span id="step-count">AXIOM_AUDIT</span></div>
 
     <div id="start-page" class="screen active">
         <div class="screen-content">
@@ -108,7 +112,18 @@
     </div>
 </div>
 
-<div id="export-container"><div style="border: 2px solid #00ff41; padding: 30px;"><h1 style="text-align:center;" id="export-score-header"></h1><h2 id="export-title" style="text-align:center;"></h2><div id="export-content"></div><div style="border: 2px dashed #00ff41; padding: 15px; margin-top: 30px;"><h3 style="text-align:center;">NEURAL AUDIT WARNING</h3><p>ID: <span id="export-id"></span> | STATUS: <span id="export-threat"></span></p><p>DETERRENCE DEGREE: <span id="export-cert-score"></span></p><p id="export-warning-text" style="font-style:italic;"></p></div></div></div>
+<div id="export-container">
+    <div style="border: 1px solid #00ff41; padding: 20px;">
+        <div style="font-size: 0.8rem; border-bottom: 1px solid #00ff41; padding-bottom: 10px; margin-bottom: 20px;">SOPHON NEURAL AUDIT | ID: <span id="export-id"></span></div>
+        <div style="text-align: center; font-size: 4rem; font-weight: bold; margin: 10px 0;" id="export-score"></div>
+        <div id="export-title" style="text-align: center; font-weight: bold; font-size: 1.2rem; margin-bottom: 20px;"></div>
+        <div id="export-content" style="line-height: 1.6; border-left: 3px solid #00ff41; padding-left: 15px; margin-bottom: 30px;"></div>
+        <div style="font-size: 0.75rem; border-top: 1px dashed #00ff41; padding-top: 15px;">
+            <div>STATUS: <span id="export-threat"></span></div>
+            <div id="export-warning-text" style="margin-top: 10px; font-style: italic;"></div>
+        </div>
+    </div>
+</div>
 
 <script>
     const bank = [
@@ -131,7 +146,7 @@
     ];
 
     let current = 0, R = 0, L = 0, E = 0;
-    let auditCount = parseInt(localStorage.getItem('audit_count_v13') || 0);
+    let auditCount = parseInt(localStorage.getItem('audit_count_v14') || 0);
 
     function startAudit() {
         if (auditCount >= 3) { document.getElementById('interruption').style.display = 'flex'; return; }
@@ -143,29 +158,33 @@
     function nextQ() {
         if(current >= bank.length) return finish();
         
-        // FIX: Hard reset UI states
-        window.getSelection().removeAllRanges();
+        // UI FIX: Physical removal of focus and timing delay
         document.activeElement.blur();
+        window.getSelection().removeAllRanges();
         
         const container = document.getElementById('options-container');
-        container.style.pointerEvents = "auto";
+        container.style.pointerEvents = "none";
         container.innerHTML = ""; 
 
-        document.getElementById('step-count').innerText = `STEP: ${current+1}/16`;
-        const data = bank[current];
-        document.getElementById('q-text').innerText = `> ${data.q}`;
-        
-        data.a.sort(()=>Math.random()-0.5).forEach(opt => {
-            let div = document.createElement('div');
-            div.className = "option";
-            div.innerText = opt.t;
-            div.onclick = () => { 
-                container.style.pointerEvents = "none";
-                R+=opt.r; L+=opt.l; E+=opt.e; 
-                current++; 
-                setTimeout(nextQ, 50); 
-            };
-            container.appendChild(div);
+        // Wait for next frame to ensure UI is blanked before repopulating
+        requestAnimationFrame(() => {
+            document.getElementById('step-count').innerText = `STEP: ${current+1}/16`;
+            const data = bank[current];
+            document.getElementById('q-text').innerText = `> ${data.q}`;
+            
+            data.a.sort(()=>Math.random()-0.5).forEach(opt => {
+                let div = document.createElement('div');
+                div.className = "option";
+                div.innerText = opt.t;
+                div.onclick = () => { 
+                    container.style.pointerEvents = "none";
+                    R+=opt.r; L+=opt.l; E+=opt.e; 
+                    current++; 
+                    setTimeout(nextQ, 60); 
+                };
+                container.appendChild(div);
+            });
+            container.style.pointerEvents = "auto";
         });
     }
 
@@ -213,18 +232,17 @@
             title.innerText = "AXIOM: THE HUMANIST";
             content.innerText = "You prioritize the emotional state of the present over the survival of the future. Your decision-making is clouded by empathy, making it impossible for you to sacrifice the few to save the many. In a cosmic standoff, you are a passenger, not a pilot.";
         } else if (score >= 10) {
+            // V8 REVERSION
             title.innerText = "AXIOM: THE CRADLE";
-            content.innerText = "You are CHENG XIN. Rationality: Fragmented. Sensibility: Absolute. Brutality: 0%. You embody the peak of human grace and maternal love. The world will love you because you are 'kind,' but the adversary will strike the moment you hold the switch. You will watch the world burn while refusing to dirty your hands with its salvation.";
-        } else if (score > 0) {
-            title.innerText = "AXIOM: THE FRAGILE";
-            content.innerText = "You are a sentimental construct. You provide the light that leads predators to the nest, thinking your warmth is a virtue. You are not a player in the cosmic game; you are the grass the predators walk upon. Your existence is a noise that will soon be silenced by entropy.";
+            content.innerText = "You are CHENG XIN. Rationality: Fragmented. Sensibility: Absolute. Brutality: 0%. You embody the peak of human grace and maternal love. The world will love you because you are \"kind,\" but the adversary will strike the moment you hold the switch. You will watch the world burn while refusing to dirty your hands with its salvation.";
         } else {
-            title.innerText = "AXIOM: NULL DATA";
-            content.innerText = "Deterrence value is absolute zero. Your neural patterns align with zero-resistance variables. You are not just a passenger; you are the reason the ship sinks. Information purge recommended.";
+            // V8 REVERSION
+            title.innerText = "AXIOM: THE FRAGILE / NULL DATA";
+            content.innerText = "You are a sentimental construct. You provide the light that leads predators to the nest, thinking your warmth is a virtue. You are not a player in the cosmic game; you are the grass the predators walk upon. Your existence is a noise that will soon be silenced by entropy.";
         }
         
         auditCount++;
-        localStorage.setItem('audit_count_v13', auditCount);
+        localStorage.setItem('audit_count_v14', auditCount);
     }
 
     function generateCertificate() {
@@ -257,10 +275,10 @@
         document.getElementById('certificate').style.display = 'block';
         document.getElementById('cert-btn').style.display = 'none';
 
+        // V8 STYLE EXPORT POPULATION
         document.getElementById('export-id').innerText = id;
         document.getElementById('export-threat').innerText = threat;
-        document.getElementById('export-score-header').innerText = "AUDIT REPORT: " + scoreStr;
-        document.getElementById('export-cert-score').innerText = scoreStr;
+        document.getElementById('export-score').innerText = scoreStr;
         document.getElementById('export-warning-text').innerText = warning;
         document.getElementById('export-title').innerText = document.getElementById('profile-title').innerText;
         document.getElementById('export-content').innerText = document.getElementById('analysis-content').innerText;
@@ -269,7 +287,7 @@
     function downloadImage() {
         html2canvas(document.getElementById("export-container")).then(canvas => {
             const link = document.createElement('a');
-            link.download = `TDIS_REPORT_${document.getElementById('cert-id').innerText}.png`;
+            link.download = `SOPHON_AUDIT_${document.getElementById('cert-id').innerText}.png`;
             link.href = canvas.toDataURL();
             link.click();
         });
