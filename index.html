@@ -7,7 +7,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root { --glow: #00ff41; --bg: #010801; --dim: #003300; --warn: #ff0000; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none !important; }
 
         body, html { 
             background: var(--bg); color: var(--glow); 
@@ -40,15 +40,16 @@
         .guide-text { line-height: 1.6; font-size: 0.9rem; color: #aaffaa; }
         .question-text { font-size: 1rem; line-height: 1.4; margin-bottom: 20px; color: #fff; }
         
-        /* FIX: UI Highlight Reset */
         .option { 
             border: 1px solid var(--dim); padding: 12px; margin: 8px 0; 
             cursor: pointer; transition: 0.1s; font-size: 0.85rem; 
-            background: rgba(0,30,0,0.3); outline: none !important;
+            background: rgba(0,30,0,0.3);
             user-select: none;
+            -webkit-user-select: none;
         }
-        /* Only shows hover effect on mouse/touch interaction, no persistent focus */
-        .option:hover, .option:active { background: rgba(0, 255, 65, 0.2); border-color: var(--glow); }
+        /* Visual feedback only on active hover/touch */
+        .option:hover { background: rgba(0, 255, 65, 0.15); border-color: var(--glow); }
+        .option:active { background: var(--glow) !important; color: #000 !important; }
 
         .score-box { text-align: center; border: 1px solid var(--glow); padding: 15px; margin-bottom: 15px; }
         .big-score { font-size: 3rem; font-weight: bold; text-shadow: 0 0 15px var(--glow); }
@@ -59,13 +60,12 @@
 
         #certificate { border: 2px dashed var(--glow); padding: 15px; margin-top: 15px; background: #000; display: none; font-size: 0.8rem; }
         
-        button { background: transparent; color: var(--glow); border: 1px solid var(--glow); padding: 12px; width: 100%; cursor: pointer; font-family: 'Courier New'; margin-top: 10px; flex-shrink: 0; font-weight: bold; outline: none; }
+        button { background: transparent; color: var(--glow); border: 1px solid var(--glow); padding: 12px; width: 100%; cursor: pointer; font-family: 'Courier New'; margin-top: 10px; flex-shrink: 0; font-weight: bold; }
         button:hover { background: var(--glow); color: #000; }
         
         .retest-btn { border-color: var(--warn); color: var(--warn); margin-top: 15px; }
         .retest-btn:hover { background: var(--warn); color: #000; }
 
-        /* Export Target - Watermark Removed */
         #export-container { 
             position: absolute; left: -9999px; top: 0; width: 600px; padding: 40px; 
             background: #010801; border: 10px solid #00ff41; color: #00ff41; 
@@ -81,7 +81,7 @@
 
 <div id="terminal">
     <div class="header">
-        <span>SOPHON_INTERFACE_V.10</span>
+        <span>SOPHON_INTERFACE_V.12</span>
         <span id="step-count">AXIOM_AUDIT</span>
     </div>
 
@@ -90,8 +90,8 @@
             <h1>THE DETERRENCE AUDIT</h1>
             <div class="guide-text">
                 <p>> GREETINGS, BUG.</p>
-                <p>> You seek to measure the weight of your hand on the switch. But a Swordholder is not a person; they are a mathematical constant. This audit will strip away your human pretenses to find the raw axioms beneath.</p>
-                <p>> Do not choose what you wish to be. Choose what you are when the sun begins to flicker.</p>
+                <p>> A Swordholder is not a person; they are a mathematical constant. This audit will find the raw axioms beneath your human pretenses.</p>
+                <p>> Choose what you are when the sun begins to flicker.</p>
             </div>
         </div>
         <button onclick="startAudit()">INITIALIZE NEURAL FEED</button>
@@ -165,7 +165,7 @@
     ];
 
     let current = 0, R = 0, L = 0, E = 0;
-    let auditCount = parseInt(localStorage.getItem('audit_count_v10') || 0);
+    let auditCount = parseInt(localStorage.getItem('audit_count_v12') || 0);
 
     function startAudit() {
         if (auditCount >= 3) {
@@ -180,23 +180,25 @@
     function nextQ() {
         if(current >= bank.length) return finish();
         
-        // FIX: Physical reset to stop highlight bleed
+        // PHYSICAL RESET: Blur and clear container
         if (document.activeElement) document.activeElement.blur();
-        
+        const container = document.getElementById('options-container');
+        container.style.pointerEvents = "auto"; // Re-enable clicking
+        container.innerHTML = ""; 
+
         document.getElementById('step-count').innerText = `STEP: ${current+1}/16`;
         const data = bank[current];
         document.getElementById('q-text').innerText = `> ${data.q}`;
-        const container = document.getElementById('options-container');
-        container.innerHTML = ""; 
         
         data.a.sort(()=>Math.random()-0.5).forEach(opt => {
             let div = document.createElement('div');
             div.className = "option";
             div.innerText = opt.t;
             div.onclick = () => { 
+                container.style.pointerEvents = "none"; // Stop double-clicking / highlight bleed
                 R+=opt.r; L+=opt.l; E+=opt.e; 
                 current++; 
-                nextQ(); 
+                setTimeout(nextQ, 50); 
             };
             container.appendChild(div);
         });
@@ -213,29 +215,49 @@
         if (score > 100) score = 100;
         if (score < 0) score = 0;
 
-        document.getElementById('score-display').innerText = score.toFixed(1) + "%";
+        const scoreDisp = score.toFixed(1) + "%";
+        document.getElementById('score-display').innerText = scoreDisp;
         const title = document.getElementById('profile-title');
         const content = document.getElementById('analysis-content');
 
+        // INTEGRATING ALL 11 SECTIONS
         if (score === 100) {
             title.innerText = "AXIOM: THE PERFECT BLADE";
-            content.innerHTML = "You are <b>THOMAS WADE</b>. Rational Thinking: Absolute/Cold. Sensibility: Erased. Brutality: Maximum. You do not carry the sword; you are the blade itself. You view humanity not as a family, but as a biological variable that must persist at any cost. Trisolarans calculate your deterrence at 100% because they know you have already accepted the end of the world. They will never attack while you breathe.";
+            content.innerText = "You are THOMAS WADE. Rational Thinking: Absolute/Cold. Sensibility: Erased. Brutality: Maximum. You do not carry the sword; you are the blade itself. You view humanity not as a family, but as a biological variable that must persist at any cost. Trisolarans calculate your deterrence at 100% because they know you have already accepted the end of the world. They will never attack while you breathe.";
         } else if (score >= 90) {
             title.innerText = "AXIOM: THE SWORDHOLDER";
-            content.innerHTML = "You are <b>LUO JI (Late Era)</b>. Rationality: 95%. Sensibility: Suppressed. Brutality: Strategic. You have balanced your humanity with the cold logic of the Dark Forest. You are the perfect Swordholder—staring into the void for 50 years without blinking. Trisolaris views you with genuine terror. You will press the button, and they know it.";
+            content.innerText = "You are LUO JI (Late Era). Rationality: 95%. Sensibility: Suppressed. Brutality: Strategic. You have balanced your humanity with the cold logic of the Dark Forest. You are the perfect Swordholder—staring into the void for 50 years without blinking. Trisolaris views you with genuine terror. You will press the button, and they know it. You hold the life of two worlds in a steady hand.";
         } else if (score >= 80) {
             title.innerText = "AXIOM: THE WALLFACER";
-            content.innerHTML = "You are a master of strategic ruthlessness. You are resolute, relentless, and possess the psychological fortitude to maintain a global threat for decades. You prioritize the species over the individual. Most of humanity would find your decisions terrifying, but your logic is the only thing keeping the sun from going dark.";
+            content.innerText = "You are a master of strategic ruthlessness. You are resolute, relentless, and possess the psychological fortitude to maintain a global threat for decades. You prioritize the species over the individual. Most of humanity would find your decisions terrifying, but your logic is the only thing keeping the sun from going dark.";
+        } else if (score >= 70) {
+            title.innerText = "AXIOM: THE IRON ADVISOR";
+            content.innerText = "Highly rational and strict. You possess the brutality to make hard calls, but you still possess a trace of 'Human Noise' that prevents total deterrence. You are the structural steel of a civilization, ensuring that systems operate with maximum efficiency even in times of collapse.";
+        } else if (score >= 60) {
+            title.innerText = "AXIOM: THE LOGICIAN";
+            content.innerText = "Rationality outweighs sensibility. You are straightforward and relentless in pursuit of a goal. However, you may hesitate when the calculation requires your own total destruction. Your deterrence is reliable but not absolute.";
+        } else if (score >= 50) {
+            title.innerText = "AXIOM: THE EQUILIBRIUM";
+            content.innerText = "A median mind. You are rational but plagued by a sense of fairness and proportion. In a cosmic standoff, 'Fairness' can be a fatal flaw. You are stable in times of peace, but a variable in times of war.";
+        } else if (score >= 40) {
+            title.innerText = "AXIOM: THE GUARDIAN";
+            content.innerText = "Sensibility begins to outweigh cold logic. You are resolute in your morals, but your strictness is targeted toward preserving peace rather than enforcing the brutal mechanism of deterrence. You seek a way out of the Dark Forest without firing a shot.";
+        } else if (score >= 30) {
+            title.innerText = "AXIOM: THE IDEALIST";
+            content.innerText = "Relentless in your hope, but dangerously weak in your ruthlessness. You believe in a universe that rewards virtue, but the environment only calculates probability. You would likely be the first to suggest a ceasefire that results in total betrayal.";
+        } else if (score >= 20) {
+            title.innerText = "AXIOM: THE HUMANIST";
+            content.innerText = "You prioritize the emotional state of the present over the survival of the future. Your decision-making is clouded by empathy, making it impossible for you to sacrifice the few to save the many. In a cosmic standoff, you are a passenger, not a pilot.";
         } else if (score >= 10) {
             title.innerText = "AXIOM: THE CRADLE";
-            content.innerHTML = "You are <b>CHENG XIN</b>. Rationality: Fragmented. Sensibility: Absolute. Brutality: 0%. You embody the peak of human grace and maternal love. The world will love you because you are 'kind,' but the adversary will strike the moment you hold the switch. You will watch the world burn while refusing to dirty your hands with its salvation.";
+            content.innerText = "You are CHENG XIN. Rationality: Fragmented. Sensibility: Absolute. Brutality: 0%. You embody the peak of human grace and maternal love. The world will love you because you are 'kind,' but the adversary will strike the moment you hold the switch. You will watch the world burn while refusing to dirty your hands with its salvation.";
         } else {
-            title.innerText = "AXIOM: NULL DATA";
-            content.innerHTML = "You are a sentimental construct. You provide the light that leads predators to the nest, thinking your warmth is a virtue. You are not a player in the cosmic game; you are the grass the predators walk upon. Your existence is a noise that will soon be silenced by entropy.";
+            title.innerText = "AXIOM: THE FRAGILE / NULL DATA";
+            content.innerText = "You are a sentimental construct. You provide the light that leads predators to the nest, thinking your warmth is a virtue. You are not a player in the cosmic game; you are the grass the predators walk upon. Your existence is a noise that will soon be silenced by entropy.";
         }
         
         auditCount++;
-        localStorage.setItem('audit_count_v10', auditCount);
+        localStorage.setItem('audit_count_v12', auditCount);
     }
 
     function generateCertificate() {
@@ -246,19 +268,19 @@
         let threat, warning;
         if (scoreVal >= 90) {
             threat = "CRITICAL / INVASION HALTED";
-            warning = "[SOPHON WARNING]: Subject is a perfect mirror of the Dark Forest. Their mental state is indistinguishable from the trigger mechanism. Probability of total mutual destruction is 100%. The fleet must maintain a distance of 1.2 light-years.";
+            warning = "[SOPHON WARNING]: Subject is a perfect mirror of the Dark Forest. Probability of total mutual destruction is 100%. The fleet must maintain a distance of 1.2 light-years.";
         } else if (scoreVal >= 70) {
             threat = "HIGH / STRATEGIC STALEMATE";
-            warning = "[SOPHON WARNING]: Subject possesses the resolve to execute the final signal. Invasion risk exceeds acceptable loss parameters. Current mission profile shifted from 'Conquest' to 'Cultural Entrapment'.";
+            warning = "[SOPHON WARNING]: Subject possesses the resolve to execute the final signal. Invasion risk exceeds acceptable loss parameters.";
         } else if (scoreVal >= 40) {
             threat = "MODERATE / PROBING AUTHORIZED";
-            warning = "[SOPHON WARNING]: Deterrence is unstable. Subject’s rationality is fighting their empathy. Probability of hesitation during a first-strike scenario is 45%. Deployment of Droplets to solar rim authorized.";
+            warning = "[SOPHON WARNING]: Deterrence is unstable. Probability of hesitation during a first-strike scenario is 45%. Deployment of Droplets authorized.";
         } else if (scoreVal >= 10) {
             threat = "LOW / INVASION WINDOW OPEN";
-            warning = "[SOPHON WARNING]: Subject's deterrence is a facade. Their commitment to 'life' makes them incapable of destroying it. First-strike success probability: 98.2%. Fleet authorized to begin planetary capture.";
+            warning = "[SOPHON WARNING]: Subject's deterrence is a facade. Commitment to 'life' makes them incapable of destroying it. First-strike success probability: 98.2%.";
         } else {
             threat = "NULL / TOTAL EXTINCTION AUTHORIZED";
-            warning = "[SOPHON WARNING]: There is no Swordholder. The switch is held by a child. Deterrence degree is negligible. Initiate the 'Australia Migration' protocol immediately.";
+            warning = "[SOPHON WARNING]: There is no Swordholder. The switch is held by a child. Initiate the 'Australia Migration' protocol immediately.";
         }
 
         document.getElementById('cert-id').innerText = id;
@@ -268,7 +290,6 @@
         document.getElementById('certificate').style.display = 'block';
         document.getElementById('cert-btn').style.display = 'none';
 
-        // Set export values
         document.getElementById('export-id').innerText = id;
         document.getElementById('export-threat').innerText = threat;
         document.getElementById('export-score').innerText = scoreStr;
