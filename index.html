@@ -18,8 +18,7 @@
         
         #terminal { 
             width: 94%; max-width: 700px; 
-            height: 82vh; height: 82svh; 
-            border: 1px solid var(--glow); padding: 20px; 
+            height: 82vh; border: 1px solid var(--glow); padding: 20px; 
             background: rgba(0,8,0,0.98); position: relative; 
             display: flex; flex-direction: column;
             box-shadow: 0 0 25px rgba(0,255,65,0.15); z-index: 5; 
@@ -31,8 +30,8 @@
             z-index: 10; background-size: 100% 3px; pointer-events: none; 
         }
 
-        .header { border-bottom: 1px solid var(--glow); margin-bottom: 15px; padding-bottom: 10px; font-size: 0.7rem; display: flex; justify-content: space-between; flex-shrink: 0; }
-        .screen-content { flex-grow: 1; overflow-y: auto; padding-right: 5px; -webkit-overflow-scrolling: touch; }
+        .header { border-bottom: 1px solid var(--glow); margin-bottom: 15px; padding-bottom: 10px; font-size: 0.7rem; display: flex; justify-content: space-between; }
+        .screen-content { flex-grow: 1; overflow-y: auto; padding-right: 5px; }
         .screen { display: none; height: 100%; flex-direction: column; }
         .active { display: flex; }
 
@@ -40,14 +39,12 @@
         .guide-text { line-height: 1.6; font-size: 0.9rem; color: #aaffaa; }
         .question-text { font-size: 1rem; line-height: 1.4; margin-bottom: 20px; color: #fff; }
         
+        /* FIX: Ensure no persistent styling */
         .option { 
             border: 1px solid var(--dim); padding: 12px; margin: 8px 0; 
             cursor: pointer; transition: 0.1s; font-size: 0.85rem; 
-            background: rgba(0,30,0,0.3);
-            user-select: none;
-            -webkit-user-select: none;
+            background: rgba(0,30,0,0.3); user-select: none;
         }
-        /* Visual feedback only on active hover/touch */
         .option:hover { background: rgba(0, 255, 65, 0.15); border-color: var(--glow); }
         .option:active { background: var(--glow) !important; color: #000 !important; }
 
@@ -55,21 +52,15 @@
         .big-score { font-size: 3rem; font-weight: bold; text-shadow: 0 0 15px var(--glow); }
 
         #interruption { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; color: var(--warn); z-index: 100; justify-content: center; align-items: center; flex-direction: column; text-align: center; }
-        .glitch-text { font-size: 1.8rem; animation: glitch 0.2s infinite; letter-spacing: 5px; }
+        .glitch-text { font-size: 1.8rem; animation: glitch 0.2s infinite; }
         @keyframes glitch { 0% { transform: translate(2px, -2px); } 50% { transform: translate(-2px, 2px); color: #fff; } 100% { transform: translate(0); } }
 
         #certificate { border: 2px dashed var(--glow); padding: 15px; margin-top: 15px; background: #000; display: none; font-size: 0.8rem; }
-        
-        button { background: transparent; color: var(--glow); border: 1px solid var(--glow); padding: 12px; width: 100%; cursor: pointer; font-family: 'Courier New'; margin-top: 10px; flex-shrink: 0; font-weight: bold; }
+        button { background: transparent; color: var(--glow); border: 1px solid var(--glow); padding: 12px; width: 100%; cursor: pointer; font-family: 'Courier New'; margin-top: 10px; font-weight: bold; }
         button:hover { background: var(--glow); color: #000; }
-        
         .retest-btn { border-color: var(--warn); color: var(--warn); margin-top: 15px; }
-        .retest-btn:hover { background: var(--warn); color: #000; }
 
-        #export-container { 
-            position: absolute; left: -9999px; top: 0; width: 600px; padding: 40px; 
-            background: #010801; border: 10px solid #00ff41; color: #00ff41; 
-        }
+        #export-container { position: absolute; left: -9999px; top: 0; width: 600px; padding: 40px; background: #010801; border: 10px solid #00ff41; color: #00ff41; }
     </style>
 </head>
 <body>
@@ -80,29 +71,21 @@
 </div>
 
 <div id="terminal">
-    <div class="header">
-        <span>SOPHON_INTERFACE_V.12</span>
-        <span id="step-count">AXIOM_AUDIT</span>
-    </div>
+    <div class="header"><span>SOPHON_INTERFACE_V.13</span><span id="step-count">AXIOM_AUDIT</span></div>
 
     <div id="start-page" class="screen active">
         <div class="screen-content">
             <h1>THE DETERRENCE AUDIT</h1>
             <div class="guide-text">
                 <p>> GREETINGS, BUG.</p>
-                <p>> A Swordholder is not a person; they are a mathematical constant. This audit will find the raw axioms beneath your human pretenses.</p>
-                <p>> Choose what you are when the sun begins to flicker.</p>
+                <p>> You seek to measure the weight of your hand on the switch. But a Swordholder is not a person; they are a mathematical constant. This audit will strip away your human pretenses to find the raw axioms beneath.</p>
+                <p>> Do not choose what you wish to be. Choose what you are when the sun begins to flicker.</p>
             </div>
         </div>
         <button onclick="startAudit()">INITIALIZE NEURAL FEED</button>
     </div>
 
-    <div id="quiz-page" class="screen">
-        <div class="screen-content" id="quiz-inner">
-            <p class="question-text" id="q-text"></p>
-            <div id="options-container"></div>
-        </div>
-    </div>
+    <div id="quiz-page" class="screen"><div class="screen-content" id="quiz-inner"><p class="question-text" id="q-text"></p><div id="options-container"></div></div></div>
 
     <div id="result-page" class="screen">
         <div class="screen-content">
@@ -111,11 +94,8 @@
                 <div class="big-score" id="score-display">0.0%</div>
                 <div id="profile-title" style="font-weight:bold; margin-top: 10px; font-size: 0.9rem;"></div>
             </div>
-            
             <div id="analysis-content" style="line-height: 1.5; font-size: 0.85rem; padding: 10px; border-left: 2px solid var(--glow);"></div>
-            
             <button id="cert-btn" onclick="generateCertificate()">GENERATE AUDIT CERTIFICATE</button>
-
             <div id="certificate">
                 <h3 style="text-align:center; margin:0; font-size: 0.9rem;">NEURAL AUDIT WARNING</h3>
                 <p style="margin: 10px 0 5px 0;">ID: <span id="cert-id"></span> | STATUS: <span id="cert-threat"></span></p>
@@ -123,26 +103,12 @@
                 <p id="cert-warning-text" style="font-size: 0.7rem; font-style: italic; border-top: 1px solid var(--glow); padding-top: 10px;"></p>
                 <button onclick="downloadImage()">SAVE AUDIT RECORD (PNG)</button>
             </div>
-
             <button class="retest-btn" onclick="location.reload()">RE-INITIALIZE AUDIT</button>
         </div>
     </div>
 </div>
 
-<div id="export-container">
-    <div style="border: 2px solid #00ff41; padding: 30px;">
-        <h1 style="text-align: center; margin-top:0; letter-spacing: 5px;">NEURAL AUDIT REPORT</h1>
-        <div style="text-align: center; font-size: 5rem; font-weight: bold; margin: 20px 0;" id="export-score"></div>
-        <h2 id="export-title" style="text-align: center; border-bottom: 1px solid #00ff41; padding-bottom: 10px;"></h2>
-        <div id="export-content" style="line-height: 1.6; font-size: 1.1rem; margin: 20px 0;"></div>
-        <div style="border: 2px dashed #00ff41; padding: 15px; margin-top: 30px;">
-            <h3 style="margin:0; font-size: 1rem; text-align:center;">NEURAL AUDIT WARNING</h3>
-            <p style="margin:10px 0; font-size: 0.9rem;">ID: <span id="export-id"></span> | STATUS: <span id="export-threat"></span></p>
-            <p style="margin:5px 0; font-size: 0.9rem;">DETERRENCE DEGREE: <span id="export-cert-score"></span></p>
-            <p id="export-warning-text" style="margin:10px 0 0 0; font-size: 0.8rem; font-style: italic; border-top: 1px solid #00ff41; padding-top: 5px;"></p>
-        </div>
-    </div>
-</div>
+<div id="export-container"><div style="border: 2px solid #00ff41; padding: 30px;"><h1 style="text-align:center;" id="export-score-header"></h1><h2 id="export-title" style="text-align:center;"></h2><div id="export-content"></div><div style="border: 2px dashed #00ff41; padding: 15px; margin-top: 30px;"><h3 style="text-align:center;">NEURAL AUDIT WARNING</h3><p>ID: <span id="export-id"></span> | STATUS: <span id="export-threat"></span></p><p>DETERRENCE DEGREE: <span id="export-cert-score"></span></p><p id="export-warning-text" style="font-style:italic;"></p></div></div></div>
 
 <script>
     const bank = [
@@ -165,13 +131,10 @@
     ];
 
     let current = 0, R = 0, L = 0, E = 0;
-    let auditCount = parseInt(localStorage.getItem('audit_count_v12') || 0);
+    let auditCount = parseInt(localStorage.getItem('audit_count_v13') || 0);
 
     function startAudit() {
-        if (auditCount >= 3) {
-            document.getElementById('interruption').style.display = 'flex';
-            return;
-        }
+        if (auditCount >= 3) { document.getElementById('interruption').style.display = 'flex'; return; }
         document.getElementById('start-page').classList.remove('active');
         document.getElementById('quiz-page').classList.add('active');
         nextQ();
@@ -180,10 +143,12 @@
     function nextQ() {
         if(current >= bank.length) return finish();
         
-        // PHYSICAL RESET: Blur and clear container
-        if (document.activeElement) document.activeElement.blur();
+        // FIX: Hard reset UI states
+        window.getSelection().removeAllRanges();
+        document.activeElement.blur();
+        
         const container = document.getElementById('options-container');
-        container.style.pointerEvents = "auto"; // Re-enable clicking
+        container.style.pointerEvents = "auto";
         container.innerHTML = ""; 
 
         document.getElementById('step-count').innerText = `STEP: ${current+1}/16`;
@@ -195,7 +160,7 @@
             div.className = "option";
             div.innerText = opt.t;
             div.onclick = () => { 
-                container.style.pointerEvents = "none"; // Stop double-clicking / highlight bleed
+                container.style.pointerEvents = "none";
                 R+=opt.r; L+=opt.l; E+=opt.e; 
                 current++; 
                 setTimeout(nextQ, 50); 
@@ -220,7 +185,6 @@
         const title = document.getElementById('profile-title');
         const content = document.getElementById('analysis-content');
 
-        // INTEGRATING ALL 11 SECTIONS
         if (score === 100) {
             title.innerText = "AXIOM: THE PERFECT BLADE";
             content.innerText = "You are THOMAS WADE. Rational Thinking: Absolute/Cold. Sensibility: Erased. Brutality: Maximum. You do not carry the sword; you are the blade itself. You view humanity not as a family, but as a biological variable that must persist at any cost. Trisolarans calculate your deterrence at 100% because they know you have already accepted the end of the world. They will never attack while you breathe.";
@@ -251,13 +215,16 @@
         } else if (score >= 10) {
             title.innerText = "AXIOM: THE CRADLE";
             content.innerText = "You are CHENG XIN. Rationality: Fragmented. Sensibility: Absolute. Brutality: 0%. You embody the peak of human grace and maternal love. The world will love you because you are 'kind,' but the adversary will strike the moment you hold the switch. You will watch the world burn while refusing to dirty your hands with its salvation.";
-        } else {
-            title.innerText = "AXIOM: THE FRAGILE / NULL DATA";
+        } else if (score > 0) {
+            title.innerText = "AXIOM: THE FRAGILE";
             content.innerText = "You are a sentimental construct. You provide the light that leads predators to the nest, thinking your warmth is a virtue. You are not a player in the cosmic game; you are the grass the predators walk upon. Your existence is a noise that will soon be silenced by entropy.";
+        } else {
+            title.innerText = "AXIOM: NULL DATA";
+            content.innerText = "Deterrence value is absolute zero. Your neural patterns align with zero-resistance variables. You are not just a passenger; you are the reason the ship sinks. Information purge recommended.";
         }
         
         auditCount++;
-        localStorage.setItem('audit_count_v12', auditCount);
+        localStorage.setItem('audit_count_v13', auditCount);
     }
 
     function generateCertificate() {
@@ -292,7 +259,7 @@
 
         document.getElementById('export-id').innerText = id;
         document.getElementById('export-threat').innerText = threat;
-        document.getElementById('export-score').innerText = scoreStr;
+        document.getElementById('export-score-header').innerText = "AUDIT REPORT: " + scoreStr;
         document.getElementById('export-cert-score').innerText = scoreStr;
         document.getElementById('export-warning-text').innerText = warning;
         document.getElementById('export-title').innerText = document.getElementById('profile-title').innerText;
