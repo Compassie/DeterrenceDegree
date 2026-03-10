@@ -18,16 +18,10 @@
         
         #terminal { 
             width: 94%; max-width: 700px; 
-            height: 82vh; border: 1px solid var(--glow); padding: 20px; 
+            height: 82vh; padding: 20px; 
             background: rgba(0,8,0,0.98); position: relative; 
             display: flex; flex-direction: column;
-            box-shadow: 0 0 25px rgba(0,255,65,0.15); z-index: 5; 
-        }
-
-        #terminal::after { 
-            content: " "; position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
-            z-index: 10; background-size: 100% 3px; pointer-events: none; 
+            z-index: 5; 
         }
 
         .header { border-bottom: 1px solid var(--glow); margin-bottom: 15px; padding-bottom: 10px; font-size: 0.7rem; display: flex; justify-content: space-between; }
@@ -50,28 +44,17 @@
         .score-box { text-align: center; border: 1px solid var(--glow); padding: 15px; margin-bottom: 15px; }
         .big-score { font-size: 3rem; font-weight: bold; text-shadow: 0 0 15px var(--glow); }
 
-        /* Sophon Flicker Effect */
-        #sophon-warning { 
-            color: var(--glow); font-weight: bold; display: none; 
-            margin-top: 15px; text-align: center;
-        }
+        #sophon-warning { color: var(--glow); font-weight: bold; display: none; margin-top: 15px; text-align: center; }
         .flicker { animation: flicker-init 0.5s step-end 3; }
         @keyframes flicker-init { 0% { opacity: 0; } 50% { opacity: 1; } 100% { opacity: 0; } }
 
         #certificate { border: 2px dashed var(--glow); padding: 15px; margin-top: 15px; background: #000; display: none; font-size: 0.8rem; }
         button { background: transparent; color: var(--glow); border: 1px solid var(--glow); padding: 12px; width: 100%; cursor: pointer; font-family: 'Courier New'; margin-top: 10px; font-weight: bold; }
         
-        /* Save Overlay for iOS */
-        #save-overlay { 
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.9); z-index: 1000; flex-direction: column; align-items: center; justify-content: center;
-        }
-        #save-overlay img { max-width: 85%; border: 2px solid var(--glow); box-shadow: 0 0 20px var(--glow); }
-
-        /* V.7 WALLPAPER LAYOUT */
+        /* V.7 DOWNLOAD LAYOUT */
         #export-container { 
             position: absolute; left: -9999px; top: 0; 
-            width: 1080px; height: 1920px; /* Locked HD Wallpaper */
+            width: 1080px; height: 1920px; 
             padding: 100px 80px; background: #010801; 
             border: 10px solid #00ff41; color: #00ff41; 
             display: flex; flex-direction: column;
@@ -82,7 +65,7 @@
 
 <div id="terminal">
     <div class="header">
-        <span>SOPHON_INTERFACE_V.17</span>
+        <span>SOPHON_INTERFACE_V.18</span>
         <span id="step-count">AXIOM_AUDIT</span>
     </div>
 
@@ -99,7 +82,12 @@
         <button onclick="startAudit()">INITIALIZE NEURAL FEED</button>
     </div>
 
-    <div id="quiz-page" class="screen"><div class="screen-content" id="quiz-inner"><p class="question-text" id="q-text"></p><div id="options-container"></div></div></div>
+    <div id="quiz-page" class="screen">
+        <div class="screen-content" id="quiz-inner">
+            <p class="question-text" id="q-text"></p>
+            <div id="options-container"></div>
+        </div>
+    </div>
 
     <div id="result-page" class="screen">
         <div class="screen-content">
@@ -115,23 +103,17 @@
                 <p style="margin: 10px 0 5px 0;">ID: <span id="cert-id"></span> | STATUS: <span id="cert-threat"></span></p>
                 <p style="margin: 0 0 10px 0;">DETERRENCE DEGREE: <span id="cert-score"></span></p>
                 <p id="cert-warning-text" style="font-size: 0.7rem; font-style: italic; border-top: 1px solid var(--glow); padding-top: 10px;"></p>
-                <button onclick="prepareSave()">GENERATE WALLPAPER</button>
+                <button onclick="downloadReport()">DOWNLOAD REPORT</button>
             </div>
             <button class="retest-btn" style="border-color:var(--warn); color:var(--warn); margin-top: 10px;" onclick="location.reload()">RE-INITIALIZE AUDIT</button>
         </div>
     </div>
 </div>
 
-<div id="save-overlay" onclick="this.style.display='none'">
-    <p style="color:var(--glow); margin-bottom: 10px;">LONG-PRESS IMAGE TO SAVE TO PHOTOS</p>
-    <div id="img-render-target"></div>
-    <p style="color:var(--warn); margin-top: 10px;">[ TAP TO CLOSE ]</p>
-</div>
-
 <div id="export-container">
-    <div style="font-size: 1.8rem; border-bottom: 4px solid #00ff41; padding-bottom: 20px; margin-bottom: 80px; letter-spacing: 4px;">SOPHON NEURAL AUDIT | ID: <span id="export-id"></span></div>
+    <div style="font-size: 1.8rem; border-bottom: 4px solid #00ff41; padding-bottom: 20px; margin-bottom: 80px;">SOPHON NEURAL AUDIT | ID: <span id="export-id"></span></div>
     <div style="text-align: center; font-size: 10rem; font-weight: bold; margin: 40px 0;" id="export-score"></div>
-    <div id="export-title" style="text-align: center; font-weight: bold; font-size: 3rem; margin-bottom: 60px; letter-spacing: 5px;"></div>
+    <div id="export-title" style="text-align: center; font-weight: bold; font-size: 3rem; margin-bottom: 60px;"></div>
     <div id="export-content" style="line-height: 1.8; border-left: 8px solid #00ff41; padding-left: 40px; font-size: 2.2rem; margin-bottom: 100px;"></div>
     <div style="margin-top: auto; border: 2px dashed #00ff41; padding: 40px;">
         <div style="font-size: 1.8rem; font-weight: bold; margin-bottom: 20px;">THREAT LEVEL: <span id="export-threat"></span></div>
@@ -180,16 +162,25 @@
     function nextQ() {
         if(current >= bank.length) return finish();
         const container = document.getElementById('options-container');
+        container.style.pointerEvents = "none";
         container.innerHTML = ""; 
+        
         document.getElementById('step-count').innerText = `STEP: ${current+1}/16`;
         const data = bank[current];
         document.getElementById('q-text').innerText = `> ${data.q}`;
+        
         data.a.sort(()=>Math.random()-0.5).forEach(opt => {
             let div = document.createElement('div');
             div.className = "option"; div.innerText = opt.t;
-            div.onclick = () => { R+=opt.r; L+=opt.l; E+=opt.e; current++; nextQ(); };
+            div.onclick = () => { 
+                container.style.pointerEvents = "none";
+                R+=opt.r; L+=opt.l; E+=opt.e; 
+                current++; 
+                setTimeout(nextQ, 100); 
+            };
             container.appendChild(div);
         });
+        setTimeout(() => { container.style.pointerEvents = "auto"; }, 200);
     }
 
     function finish() {
@@ -206,31 +197,31 @@
 
         if (score === 100) {
             title.innerText = "AXIOM: THE PERFECT BLADE";
-            content.innerText = "You are THOMAS WADE. Rational Thinking: Absolute/Cold. Sensibility: Erased. Brutality: Maximum. You do not carry the sword; you are the blade itself...";
+            content.innerText = "You are THOMAS WADE. Rational Thinking: Absolute/Cold. Sensibility: Erased. Brutality: Maximum. You do not carry the sword; you are the blade itself. You view humanity not as a biological constant, but as a variable that must persist at any cost. Trisolarans calculate your deterrence at 100% because they know you have already accepted the end of the world. They will never attack while you breathe.";
         } else if (score >= 90) {
             title.innerText = "AXIOM: THE SWORDHOLDER";
-            content.innerText = "You are LUO JI (Late Era). Rationality: 95%. Sensibility: Suppressed. Brutality: Strategic. You have balanced your humanity with the cold logic of the Dark Forest...";
+            content.innerText = "You are LUO JI (Late Era). Rationality: 95%. Sensibility: Suppressed. Brutality: Strategic. You have balanced your humanity with the cold logic of the Dark Forest. You are the perfect Swordholder—staring into the void for 50 years without blinking. Trisolaris views you with genuine terror. You will press the button, and they know it. You hold the life of two worlds in a steady hand.";
         } else if (score >= 80) {
             title.innerText = "AXIOM: THE WALLFACER";
-            content.innerText = "You are a master of strategic ruthlessness. You are resolute, relentless, and possess the psychological fortitude to maintain a global threat for decades...";
+            content.innerText = "You are a master of strategic ruthlessness. You are resolute, relentless, and possess the psychological fortitude to maintain a global threat for decades. You prioritize the species over the individual. Most of humanity would find your decisions terrifying, but your logic is the only thing keeping the sun from going dark.";
         } else if (score >= 70) {
             title.innerText = "AXIOM: THE IRON ADVISOR";
-            content.innerText = "Highly rational and strict. You possess the brutality to make hard calls, but you still possess a trace of 'Human Noise'...";
+            content.innerText = "Highly rational and strict. You possess the brutality to make hard calls, but you still possess a trace of 'Human Noise' that prevents total deterrence. You are the structural steel of a civilization, ensuring that systems operate with maximum efficiency even in times of collapse.";
         } else if (score >= 60) {
             title.innerText = "AXIOM: THE LOGICIAN";
-            content.innerText = "Rationality outweighs sensibility. You are straightforward and relentless in pursuit of a goal...";
+            content.innerText = "Rationality outweighs sensibility. You are straightforward and relentless in pursuit of a goal. However, you may hesitate when the calculation requires your own total destruction. Your deterrence is reliable but not absolute.";
         } else if (score >= 50) {
             title.innerText = "AXIOM: THE EQUILIBRIUM";
-            content.innerText = "A median mind. You are rational but plagued by a sense of fairness and proportion...";
+            content.innerText = "A median mind. You are rational but plagued by a sense of fairness and proportion. In a cosmic standoff, 'Fairness' can be a fatal flaw. You are stable in times of peace, but a variable in times of war.";
         } else if (score >= 40) {
             title.innerText = "AXIOM: THE GUARDIAN";
-            content.innerText = "Sensibility begins to outweigh cold logic. You are resolute in your morals...";
+            content.innerText = "Sensibility begins to outweigh cold logic. You are resolute in your morals, but your strictness is targeted toward preserving peace rather than enforcing the brutal mechanism of deterrence. You seek a way out of the Dark Forest without firing a shot.";
         } else if (score >= 30) {
             title.innerText = "AXIOM: THE IDEALIST";
-            content.innerText = "Relentless in your hope, but dangerously weak in your ruthlessness...";
+            content.innerText = "Relentless in your hope, but dangerously weak in your ruthlessness. You believe in a universe that rewards virtue, but the environment only calculates probability. You would likely be the first to suggest a ceasefire that results in total betrayal.";
         } else if (score >= 20) {
             title.innerText = "AXIOM: THE HUMANIST";
-            content.innerText = "You prioritize the emotional state of the present over the survival of the future...";
+            content.innerText = "You prioritize the emotional state of the present over the survival of the future. Your decision-making is clouded by empathy, making it impossible for you to sacrifice the few to save the many. In a cosmic standoff, you are a passenger, not a pilot.";
         } else if (score > 0) {
             title.innerText = "AXIOM: THE FRAGILE";
             content.innerText = "SOPHON ANALYSIS: You are a sentimental construct. You prioritize the individual heartbeat over the survival of the stellar system. You provide the light that leads predators to the nest, thinking your warmth is a virtue. To us, you are merely a data-point of inefficiency. You have no place in the Dark Forest; you are the prey that thinks the hunter is just another shadow.";
@@ -244,9 +235,9 @@
         const id = Math.random().toString(36).substr(2, 6).toUpperCase();
         const scoreVal = parseFloat(document.getElementById('score-display').innerText);
         let threat, warning;
-        if (scoreVal >= 90) { threat = "CRITICAL / INVASION HALTED"; warning = "[SOPHON WARNING]: Subject is a perfect mirror of the Dark Forest. Probability of total mutual destruction is 100%."; }
-        else if (scoreVal >= 40) { threat = "MODERATE / PROBING AUTHORIZED"; warning = "[SOPHON WARNING]: Deterrence is unstable. Probability of hesitation is high."; }
-        else { threat = "NULL / TOTAL EXTINCTION AUTHORIZED"; warning = "[SOPHON WARNING]: There is no Swordholder. Initiate the 'Australia Migration' protocol immediately."; }
+        if (scoreVal >= 90) { threat = "CRITICAL / INVASION HALTED"; warning = "[SOPHON WARNING]: Subject is a perfect mirror of the Dark Forest. Probability of total mutual destruction is 100%. The fleet must maintain a distance of 1.2 light-years."; }
+        else if (scoreVal >= 40) { threat = "MODERATE / PROBING AUTHORIZED"; warning = "[SOPHON WARNING]: Deterrence is unstable. Probability of hesitation during a first-strike scenario is 45%. Deployment of Droplets authorized."; }
+        else { threat = "NULL / TOTAL EXTINCTION AUTHORIZED"; warning = "[SOPHON WARNING]: There is no Swordholder. The switch is held by a child. Initiate the 'Australia Migration' protocol immediately."; }
 
         document.getElementById('cert-id').innerText = id;
         document.getElementById('cert-threat').innerText = threat;
@@ -263,13 +254,12 @@
         document.getElementById('export-content').innerText = document.getElementById('analysis-content').innerText;
     }
 
-    function prepareSave() {
+    function downloadReport() {
         html2canvas(document.getElementById("export-container"), { scale: 1 }).then(canvas => {
-            const img = new Image();
-            img.src = canvas.toDataURL();
-            document.getElementById('img-render-target').innerHTML = "";
-            document.getElementById('img-render-target').appendChild(img);
-            document.getElementById('save-overlay').style.display = 'flex';
+            const link = document.createElement('a');
+            link.download = `TDIS_AUDIT_${document.getElementById('cert-id').innerText}.png`;
+            link.href = canvas.toDataURL();
+            link.click();
         });
     }
 </script>
