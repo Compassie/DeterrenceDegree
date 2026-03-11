@@ -39,11 +39,20 @@
         #certificate { border: 2px dashed var(--glow); padding: 15px; margin-top: 15px; background: #000; display: none; font-size: 0.8rem; }
         button { background: transparent; color: var(--glow); border: 1px solid var(--glow); padding: 12px; width: 100%; cursor: pointer; font-family: 'Courier New'; margin-top: 10px; font-weight: bold; }
         
-        #save-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 1000; flex-direction: column; align-items: center; justify-content: center; }
-        #render-output { width: 100%; display: flex; justify-content: center; align-items: center; }
-        #save-overlay img { max-width: 90%; max-height: 85vh; border: 1px solid var(--glow); }
+        /* ADJUSTED DOWNLOAD PAGE OVERLAY */
+        #save-overlay { 
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.98); z-index: 1000; 
+            flex-direction: column; align-items: center; justify-content: space-between;
+            padding: 20px 0;
+        }
+        .instruction-top { color: var(--glow); font-weight: bold; letter-spacing: 2px; font-size: 0.8rem; }
+        .instruction-bottom { color: var(--warn); font-weight: bold; font-size: 0.8rem; letter-spacing: 1px; }
 
-        /* VERSION 7 REPORT LAYOUT - ENHANCED */
+        #render-output { width: 100%; flex-grow: 1; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+        #render-output img { max-width: 95%; max-height: 80vh; border: 1px solid var(--glow); object-fit: contain; }
+
+        /* V7 IMAGE TEMPLATE */
         #export-container { 
             position: absolute; left: -9999px; top: 0; 
             width: 1080px; height: 1920px; 
@@ -56,7 +65,7 @@
 <body onload="initSophon()">
 
 <div id="terminal">
-    <div class="header"><span>SOPHON_INTERFACE_V.23</span><span id="step-count">AXIOM_AUDIT</span></div>
+    <div class="header"><span>SOPHON_INTERFACE_V.24</span><span id="step-count">AXIOM_AUDIT</span></div>
     <div id="start-page" class="screen active">
         <div class="screen-content">
             <h1>THE DETERRENCE AUDIT</h1>
@@ -93,9 +102,9 @@
 </div>
 
 <div id="save-overlay" onclick="this.style.display='none'">
-    <p style="color:var(--glow); margin-bottom: 20px; font-weight: bold;">HOLD IMAGE TO SAVE TO PHOTOS</p>
+    <div class="instruction-top">HOLD IMAGE TO SAVE TO PHOTOS</div>
     <div id="render-output"></div>
-    <p style="color:var(--warn); margin-top: 20px;">[ TAP TO CLOSE ]</p>
+    <div class="instruction-bottom">CLICK ANYWHERE TO CLOSE</div>
 </div>
 
 <div id="export-container">
@@ -166,42 +175,43 @@
         const title = document.getElementById('profile-title');
         const content = document.getElementById('analysis-content');
 
+        // NEW HARD-CODED CONTENT STRINGS
         if (score === 100) {
             title.innerText = "AXIOM: THE PERFECT BLADE";
-            content.innerText = "You are THOMAS WADE. Rational Thinking: Absolute and Cold. Sensibility: Entirely Erased. Brutality: Maximum. You do not simply carry the sword; you are the edge of the blade itself. You view humanity not as a biological constant, but as a mathematical variable that must persist at any cost, regardless of the blood spilled. Trisolarans calculate your deterrence at 100% because they know you have already accepted the end of the world.";
+            content.innerText = "You are THOMAS WADE. Rational Thinking: Absolute/Cold. Sensibility: Erased. Brutality: Maximum. You do not carry the sword; you are the blade itself. You view humanity not as a family, but as a biological variable that must persist at any cost. Trisolarans calculate your deterrence at 100% because they know you have already accepted the end of the world. They will never attack while you breathe.";
         } else if (score >= 90) {
             title.innerText = "AXIOM: THE SWORDHOLDER";
-            content.innerText = "You are LUO JI (Late Era). Rationality: 95%. Sensibility: Suppressed. Brutality: Strategic. You have perfectly balanced your core humanity with the freezing, cold logic of the Dark Forest theory. You are the perfect Swordholder—staring into the infinite void for fifty years without ever blinking. Trisolaris views you with genuine, calculated terror. You will press the button if pushed, and they know it. You hold the life of two worlds in a steady hand.";
+            content.innerText = "You are LUO JI (Late Era). Rationality: 95%. Sensibility: Suppressed. Brutality: Strategic. You have balanced your humanity with the cold logic of the Dark Forest. You are the perfect Swordholder—staring into the void for 50 years without blinking. Trisolaris views you with genuine terror. You will press the button, and they know it. You hold the life of two worlds in a steady hand.";
         } else if (score >= 80) {
             title.innerText = "AXIOM: THE WALLFACER";
-            content.innerText = "You are a master of strategic ruthlessness. You are resolute, relentless, and possess the psychological fortitude required to maintain a global threat for many decades. You prioritize the long-term survival of the species over the immediate comfort of the individual. Most of humanity would find your cold decisions terrifying, but your logic is the only thing keeping the sun from going dark in this hostile universe.";
+            content.innerText = "You are a master of strategic ruthlessness. You are resolute, relentless, and possess the psychological fortitude to maintain a global threat for decades. You prioritize the species over the individual. Most of humanity would find your decisions terrifying, but your logic is the only thing keeping the sun from going dark.";
         } else if (score >= 70) {
             title.innerText = "AXIOM: THE IRON ADVISOR";
-            content.innerText = "You are highly rational and mathematically strict. You possess the inherent brutality to make the hard calls that others shy away from, but you still possess a faint trace of 'Human Noise' that prevents total deterrence. You are the structural steel of a civilization, ensuring that systems operate with maximum efficiency even during times of absolute collapse and total societal despair.";
+            content.innerText = "Highly rational and strict. You possess the brutality to make hard calls, but you still possess a trace of 'Human Noise' that prevents total deterrence. You are the structural steel of a civilization, ensuring that systems operate with maximum efficiency even in times of collapse.";
         } else if (score >= 60) {
             title.innerText = "AXIOM: THE LOGICIAN";
-            content.innerText = "Your rationality significantly outweighs your sensibility. You are straightforward, efficient, and relentless in the pursuit of a goal. However, you may hesitate when the calculation requires your own total destruction or the destruction of everything you have built. Your deterrence is reliable for standard operations but not absolute when faced with a true cosmic zero-sum game.";
+            content.innerText = "Rationality outweighs sensibility. You are straightforward and relentless in pursuit of a goal. However, you may hesitate when the calculation requires your own total destruction. Your deterrence is reliable but not absolute.";
         } else if (score >= 50) {
             title.innerText = "AXIOM: THE EQUILIBRIUM";
-            content.innerText = "You possess a median mind. You are rational but often plagued by a persistent sense of fairness and proportion. In a cosmic standoff where only the ruthless survive, 'Fairness' is often a fatal flaw. You are stable in times of peace, providing a balanced perspective, but you remain a dangerous variable in times of total war where extreme measures are required.";
+            content.innerText = "A median mind. You are rational but plagued by a sense of fairness and proportion. In a cosmic standoff, 'Fairness' can be a fatal flaw. You are stable in times of peace, but a variable in times of war.";
         } else if (score >= 40) {
             title.innerText = "AXIOM: THE GUARDIAN";
-            content.innerText = "Your sensibility begins to outweigh your cold logic. You are resolute in your morals, but your strictness is targeted toward preserving peace rather than enforcing the brutal mechanism of deterrence. You seek a way out of the Dark Forest without firing a shot, hoping for a cooperation that the universe rarely provides. You are a shield that refuses to become a sword.";
+            content.innerText = "Sensibility begins to outweigh cold logic. You are resolute in your morals, but your strictness is targeted toward preserving peace rather than enforcing the brutal mechanism of deterrence. You seek a way out of the Dark Forest without firing a shot.";
         } else if (score >= 30) {
             title.innerText = "AXIOM: THE IDEALIST";
-            content.innerText = "You are relentless in your hope, but dangerously weak in your capacity for ruthlessness. You believe in a universe that rewards virtue and empathy, but the cosmic environment only calculates probability and survival. You would likely be the first to suggest a ceasefire or a compromise that results in total betrayal by a more predatory civilization. Your kindness is your greatest vulnerability.";
+            content.innerText = "Relentless in your hope, but dangerously weak in your ruthlessness. You believe in a universe that rewards virtue, but the environment only calculates probability. You would likely be the first to suggest a ceasefire that results in total betrayal.";
         } else if (score >= 20) {
             title.innerText = "AXIOM: THE HUMANIST";
-            content.innerText = "You prioritize the emotional state of the present moment over the long-term survival of the future species. Your decision-making is heavily clouded by empathy, making it impossible for you to sacrifice the few to save the many. In a cosmic standoff, you are a passenger rather than a pilot. You would rather die with your dignity intact than live by committing a necessary atrocity.";
+            content.innerText = "You prioritize the emotional state of the present over the survival of the future. Your decision-making is clouded by empathy, making it impossible for you to sacrifice the few to save the many. In a cosmic standoff, you are a passenger, not a pilot.";
         } else if (score >= 10) {
-            title.innerText = "AXIOM: THE SWORDHOLDER'S MISTAKE";
-            content.innerText = "You are CHENG XIN. You are the warmth that invites the hunter to the nest. You were chosen for your love, but in a universe of cold equations, love is the signal of a victim. You held the trigger and hesitated because you could not bear the weight of a world's death. Because of your choice, the cradle was destroyed. You represent the tragic beauty of a humanity that is too pure to survive the stars.";
+            title.innerText = "AXIOM: THE CRADLE";
+            content.innerText = "You are CHENG XIN. Rationality: Fragmented. Sensibility: Absolute. Brutality: 0%. You embody the peak of human grace and maternal love. The world will love you because you are 'kind,' but the adversary will strike the moment you hold the switch. You will watch the world burn while refusing to dirty your hands with its salvation.";
         } else if (score > 0) {
             title.innerText = "AXIOM: THE FRAGILE";
-            content.innerText = "SOPHON ANALYSIS: You are a sentimental construct. You prioritize the individual heartbeat over the survival of the stellar system. You provide the light that leads predators to the nest, thinking your warmth is a virtue. To us, you are merely a data-point of inefficiency. You have no place in the Dark Forest; you are the prey that thinks the hunter is just another shadow in the woods.";
+            content.innerText = "SOPHON ANALYSIS: You are a sentimental construct. You prioritize the individual heartbeat over the survival of the stellar system. You provide the light that leads predators to the nest, thinking your warmth is a virtue. To us, you are merely a data-point of inefficiency. You have no place in the Dark Forest; you are the prey that thinks the hunter is just another shadow.";
         } else {
             title.innerText = "AXIOM: NULL DATA";
-            content.innerText = "SOPHON ANALYSIS: This subject is an evolutionary error. You possess neither the logic to survive nor the brutality to deter. Humanity views you as a comfort; Trisolaris views you with absolute disdain. You are not a player in the cosmic game; you are the grass the predators walk upon. A waste of neural complexity. Your existence is a noise that will soon be silenced by the cold march of entropy.";
+            content.innerText = "SOPHON ANALYSIS: This subject is an evolutionary error. You possess neither the logic to survive nor the brutality to deter. Humanity views you as a comfort; Trisolaris views you with absolute disdain. You are not a player in the cosmic game; you are the grass the predators walk upon. A waste of neural complexity. Your existence is a noise that will soon be silenced by entropy.";
         }
     }
 
