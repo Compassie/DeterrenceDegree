@@ -43,7 +43,7 @@
         #render-output { width: 100%; display: flex; justify-content: center; align-items: center; }
         #save-overlay img { max-width: 90%; max-height: 85vh; border: 1px solid var(--glow); }
 
-        /* VERSION 7 REPORT LAYOUT */
+        /* VERSION 7 REPORT LAYOUT - ENHANCED */
         #export-container { 
             position: absolute; left: -9999px; top: 0; 
             width: 1080px; height: 1920px; 
@@ -56,7 +56,7 @@
 <body onload="initSophon()">
 
 <div id="terminal">
-    <div class="header"><span>SOPHON_INTERFACE_V.22</span><span id="step-count">AXIOM_AUDIT</span></div>
+    <div class="header"><span>SOPHON_INTERFACE_V.23</span><span id="step-count">AXIOM_AUDIT</span></div>
     <div id="start-page" class="screen active">
         <div class="screen-content">
             <h1>THE DETERRENCE AUDIT</h1>
@@ -100,12 +100,14 @@
 
 <div id="export-container">
     <div style="font-size: 1.8rem; border-bottom: 4px solid #00ff41; padding-bottom: 20px; margin-bottom: 80px;">SOPHON NEURAL AUDIT | ID: <span id="export-id"></span></div>
-    <div style="text-align: center; font-size: 10rem; font-weight: bold; margin: 40px 0;" id="export-score"></div>
-    <div id="export-title" style="text-align: center; font-weight: bold; font-size: 3rem; margin-bottom: 60px;"></div>
-    <div id="export-content" style="line-height: 1.8; border-left: 8px solid #00ff41; padding-left: 40px; font-size: 2.2rem; margin-bottom: 100px;"></div>
-    <div style="margin-top: auto; border: 2px dashed #00ff41; padding: 40px;">
-        <div style="font-size: 1.8rem; font-weight: bold; margin-bottom: 20px;">THREAT LEVEL: <span id="export-threat"></span></div>
-        <div id="export-warning-text" style="font-size: 1.6rem; font-style: italic;"></div>
+    <div style="text-align: center; font-size: 11rem; font-weight: bold; margin: 40px 0;" id="export-score"></div>
+    <div id="export-title" style="text-align: center; font-weight: bold; font-size: 3.5rem; margin-bottom: 60px;"></div>
+    <div id="export-content" style="line-height: 1.8; padding-left: 0; font-size: 2.3rem; margin-bottom: 100px;"></div>
+    
+    <div style="margin-top: auto; border: 8px dashed #00ff41; padding: 60px; background: rgba(0,255,65,0.03);">
+        <div style="font-size: 3.2rem; font-weight: bold; margin-bottom: 30px; text-decoration: underline;">AUDIT CERTIFICATE</div>
+        <div style="font-size: 2.6rem; margin-bottom: 20px; font-weight: bold;">THREAT_LEVEL: <span id="export-threat"></span></div>
+        <div id="export-warning-text" style="font-size: 2.4rem; font-style: italic; line-height: 1.5;"></div>
     </div>
 </div>
 
