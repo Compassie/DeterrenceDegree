@@ -246,9 +246,10 @@
         const scoreVal = parseFloat(document.getElementById('score-display').innerText);
         let threat, warning;
         if (scoreVal >= 90) { threat = "CRITICAL / INVASION HALTED"; warning = "[SOPHON WARNING]: Subject is a perfect mirror of the Dark Forest. Probability of total mutual destruction is 100%. The fleet must maintain a distance of 1.2 light-years."; }
-        else if (scoreVal >= 70) { threat = "HIGH / TACTICAL DELAY"; warning = "[SOPHON WARNING]: High logical resistance detected. Avoid direct confrontation until internal noise increases."; }
-        else if (scoreVal >= 40) { threat = "MODERATE / PROBING AUTHORIZED"; warning = "[SOPHON WARNING]: Deterrence is unstable. Probability of hesitation is high. Deployment of Droplets authorized."; }
-        else if (scoreVal >= 10) { threat = "LOW / IMMINENT COLLAPSE"; warning = "[SOPHON WARNING]: Subject values 'Humanity' over 'Survival'. Total compliance predicted within 48 hours."; }
+        else if (scoreVal >= 80) { threat = "HIGH / TACTICAL DELAY"; warning = "[SOPHON WARNING]: High logical resistance detected. Avoid direct confrontation until internal noise increases."; }
+        else if (scoreVal >= 50) { threat = "MODERATE / PROBING AUTHORIZED"; warning = "[SOPHON WARNING]: Deterrence is unstable. Probability of hesitation is high. Deployment of Droplets authorized."; }
+        else if (scoreVal >= 30) { threat = "LOW / IMMINENT COLLAPSE"; warning = "[SOPHON WARNING]: Subject values 'Humanity' over 'Survival'. Total compliance predicted within 48 hours."; }
+        else if (scoreVal >= 10) { threat = "LOW / IMMINENT COLLAPSE"; warning = "[SOPHON WARNING]: DETERRENCE TERMINATED. LAUNCH THE DROPLETS. DESTROY ALL GRAVITATIONAL WAVE TRANSMITTERS IMMEDIATELY."; }
         else { threat = "NULL / TOTAL EXTINCTION AUTHORIZED"; warning = "[SOPHON WARNING]: There is no Swordholder. The switch is held by a child. Initiate the 'Australia Migration' protocol immediately."; }
 
         document.getElementById('cert-id').innerText = id;
