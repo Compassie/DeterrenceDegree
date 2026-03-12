@@ -36,7 +36,7 @@
         .flicker { animation: flicker-init 0.5s step-end 3; }
         @keyframes flicker-init { 0% { opacity: 0; } 50% { opacity: 1; } 100% { opacity: 0; } }
         
-        /* v3 INTERRUPTION OVERLAY */
+        /* v3 EXACT INTERRUPTION OVERLAY */
         #interruption-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #000; color: #f00; z-index: 9999;
@@ -59,7 +59,6 @@
         #render-output { width: 100%; flex-grow: 1; display: flex; justify-content: center; align-items: center; overflow: hidden; }
         #render-output img { max-width: 95%; max-height: 80vh; border: 1px solid var(--glow); object-fit: contain; }
 
-        /* V7 IMAGE TEMPLATE - FRAME FIX & FONT ADJUST */
         #export-container { 
             position: absolute; left: -9999px; top: 0; 
             width: 1080px; height: 1920px; 
@@ -73,12 +72,13 @@
 <body onload="initSophon()">
 
 <div id="interruption-overlay">
-    <div style="font-size: 4rem; margin-bottom: 20px;">[ERROR]</div>
-    <div id="glitch-text">YOU ARE BUGS.</div>
+    <div style="font-size: 4rem; margin-bottom: 20px;">[DENIED]</div>
+    <div>SOPHON INTERRUPTION: MAXIMUM AUDITS REACHED.</div>
+    <div style="font-size: 1rem; margin-top: 20px; color: #600;">THE UNIVERSE HAS NO MEMORY FOR REPEATED FAILURES.</div>
 </div>
 
 <div id="terminal">
-    <div class="header"><span>SOPHON_INTERFACE_V.26</span><span id="step-count">AXIOM_AUDIT</span></div>
+    <div class="header"><span>SOPHON_INTERFACE_V.27</span><span id="step-count">AXIOM_AUDIT</span></div>
     <div id="start-page" class="screen active">
         <div class="screen-content">
             <h1>THE DETERRENCE AUDIT</h1>
@@ -134,22 +134,19 @@
 </div>
 
 <script>
+    /* v3 EXACT PERSISTENT INTERRUPTION LOGIC */
+    let auditCount = localStorage.getItem('sophon_audits') || 0;
+    
     function initSophon() {
+        if(auditCount >= 5) {
+            document.getElementById('interruption-overlay').style.display = 'flex';
+            return;
+        }
         setTimeout(() => {
             const el = document.getElementById('sophon-warning');
             el.style.display = 'block'; el.classList.add('flicker');
             setTimeout(() => { el.style.display = 'none'; }, 1500);
         }, 3000);
-    }
-
-    /* v3 SOPHON INTERRUPTION */
-    function sophonInterference() {
-        const overlay = document.getElementById('interruption-overlay');
-        const glitchText = document.getElementById('glitch-text');
-        const lines = ["YOU ARE BUGS.", "WE ARE WATCHING.", "UNIVERSE IS COLD.", "SCIENCE IS DEAD."];
-        glitchText.innerText = lines[Math.floor(Math.random() * lines.length)];
-        overlay.style.display = 'flex';
-        setTimeout(() => { overlay.style.display = 'none'; }, 600);
     }
 
     const bank = [
@@ -172,10 +169,15 @@
     ];
 
     let current = 0, R = 0, L = 0, E = 0;
-    function startAudit() { document.getElementById('start-page').classList.remove('active'); document.getElementById('quiz-page').classList.add('active'); nextQ(); }
+    function startAudit() { 
+        auditCount++;
+        localStorage.setItem('sophon_audits', auditCount);
+        document.getElementById('start-page').classList.remove('active'); 
+        document.getElementById('quiz-page').classList.add('active'); 
+        nextQ(); 
+    }
     
     function nextQ() {
-        if (Math.random() < 0.2) sophonInterference();
         if(current >= bank.length) return finish();
         const container = document.getElementById('options-container');
         container.style.pointerEvents = "none"; container.innerHTML = ""; 
@@ -269,7 +271,9 @@
             scale: 1,
             useCORS: true,
             scrollX: 0,
-            scrollY: -window.scrollY
+            scrollY: -window.scrollY,
+            windowWidth: 1080,
+            windowHeight: 1920
         }).then(canvas => {
             const img = new Image(); img.src = canvas.toDataURL();
             document.getElementById('render-output').innerHTML = "";
