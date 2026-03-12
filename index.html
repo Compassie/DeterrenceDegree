@@ -35,11 +35,13 @@
         #sophon-warning { color: var(--glow); font-weight: bold; display: none; margin-top: 15px; text-align: center; }
         .flicker { animation: flicker-init 0.5s step-end 3; }
         @keyframes flicker-init { 0% { opacity: 0; } 50% { opacity: 1; } 100% { opacity: 0; } }
+        
+        /* Interruption Overlay */
+        #interruption { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; color: var(--glow); z-index: 2000; justify-content: center; align-items: center; font-size: 1.5rem; text-align: center; padding: 20px; font-weight: bold; }
 
         #certificate { border: 2px dashed var(--glow); padding: 15px; margin-top: 15px; background: #000; display: none; font-size: 0.8rem; }
         button { background: transparent; color: var(--glow); border: 1px solid var(--glow); padding: 12px; width: 100%; cursor: pointer; font-family: 'Courier New'; margin-top: 10px; font-weight: bold; }
         
-        /* ADJUSTED DOWNLOAD PAGE OVERLAY */
         #save-overlay { 
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(0,0,0,0.98); z-index: 1000; 
@@ -52,11 +54,11 @@
         #render-output { width: 100%; flex-grow: 1; display: flex; justify-content: center; align-items: center; overflow: hidden; }
         #render-output img { max-width: 95%; max-height: 80vh; border: 1px solid var(--glow); object-fit: contain; }
 
-        /* V7 IMAGE TEMPLATE */
+        /* V7 IMAGE TEMPLATE - SPACE OPTIMIZED */
         #export-container { 
             position: absolute; left: -9999px; top: 0; 
             width: 1080px; height: 1920px; 
-            padding: 100px 80px; background: #010801; 
+            padding: 80px 70px; background: #010801; 
             border: 10px solid #00ff41; color: #00ff41; 
             display: flex; flex-direction: column;
         }
@@ -64,8 +66,10 @@
 </head>
 <body onload="initSophon()">
 
+<div id="interruption">YOU ARE BUGS.</div>
+
 <div id="terminal">
-    <div class="header"><span>SOPHON_INTERFACE_V.24</span><span id="step-count">AXIOM_AUDIT</span></div>
+    <div class="header"><span>SOPHON_INTERFACE_V.25</span><span id="step-count">AXIOM_AUDIT</span></div>
     <div id="start-page" class="screen active">
         <div class="screen-content">
             <h1>THE DETERRENCE AUDIT</h1>
@@ -108,15 +112,15 @@
 </div>
 
 <div id="export-container">
-    <div style="font-size: 1.8rem; border-bottom: 4px solid #00ff41; padding-bottom: 20px; margin-bottom: 80px;">SOPHON NEURAL AUDIT | ID: <span id="export-id"></span></div>
-    <div style="text-align: center; font-size: 11rem; font-weight: bold; margin: 40px 0;" id="export-score"></div>
-    <div id="export-title" style="text-align: center; font-weight: bold; font-size: 3.5rem; margin-bottom: 60px;"></div>
-    <div id="export-content" style="line-height: 1.8; padding-left: 0; font-size: 2.3rem; margin-bottom: 100px;"></div>
+    <div style="font-size: 1.6rem; border-bottom: 4px solid #00ff41; padding-bottom: 15px; margin-bottom: 40px;">SOPHON NEURAL AUDIT | ID: <span id="export-id"></span></div>
+    <div style="text-align: center; font-size: 10rem; font-weight: bold; margin: 30px 0;" id="export-score"></div>
+    <div id="export-title" style="text-align: center; font-weight: bold; font-size: 3.2rem; margin-bottom: 40px;"></div>
+    <div id="export-content" style="line-height: 1.6; padding-left: 0; font-size: 2.1rem; margin-bottom: 40px;"></div>
     
-    <div style="margin-top: auto; border: 8px dashed #00ff41; padding: 60px; background: rgba(0,255,65,0.03);">
-        <div style="font-size: 3.2rem; font-weight: bold; margin-bottom: 30px; text-decoration: underline;">AUDIT CERTIFICATE</div>
-        <div style="font-size: 2.6rem; margin-bottom: 20px; font-weight: bold;">THREAT_LEVEL: <span id="export-threat"></span></div>
-        <div id="export-warning-text" style="font-size: 2.4rem; font-style: italic; line-height: 1.5;"></div>
+    <div style="margin-top: auto; border: 8px dashed #00ff41; padding: 40px; background: rgba(0,255,65,0.03);">
+        <div style="font-size: 2.8rem; font-weight: bold; margin-bottom: 20px; text-decoration: underline;">AUDIT CERTIFICATE</div>
+        <div style="font-size: 2.3rem; margin-bottom: 15px; font-weight: bold;">THREAT_LEVEL: <span id="export-threat"></span></div>
+        <div id="export-warning-text" style="font-size: 2.1rem; font-style: italic; line-height: 1.4;"></div>
     </div>
 </div>
 
@@ -127,6 +131,14 @@
             el.style.display = 'block'; el.classList.add('flicker');
             setTimeout(() => { el.style.display = 'none'; }, 1500);
         }, 3000);
+    }
+
+    function triggerInterruption() {
+        const overlay = document.getElementById('interruption');
+        const phrases = ["YOU ARE BUGS.", "WE ARE EVERYWHERE.", "THE FOREST IS DARK.", "SCIENCE HAS STOPPED."];
+        overlay.innerText = phrases[Math.floor(Math.random() * phrases.length)];
+        overlay.style.display = 'flex';
+        setTimeout(() => { overlay.style.display = 'none'; }, 800);
     }
 
     const bank = [
@@ -152,6 +164,7 @@
     function startAudit() { document.getElementById('start-page').classList.remove('active'); document.getElementById('quiz-page').classList.add('active'); nextQ(); }
     
     function nextQ() {
+        if (Math.random() < 0.15) triggerInterruption();
         if(current >= bank.length) return finish();
         const container = document.getElementById('options-container');
         container.style.pointerEvents = "none"; container.innerHTML = ""; 
@@ -175,7 +188,6 @@
         const title = document.getElementById('profile-title');
         const content = document.getElementById('analysis-content');
 
-        // NEW HARD-CODED CONTENT STRINGS
         if (score === 100) {
             title.innerText = "AXIOM: THE PERFECT BLADE";
             content.innerText = "You are THOMAS WADE. Rational Thinking: Absolute/Cold. Sensibility: Erased. Brutality: Maximum. You do not carry the sword; you are the blade itself. You view humanity not as a family, but as a biological variable that must persist at any cost. Trisolarans calculate your deterrence at 100% because they know you have already accepted the end of the world. They will never attack while you breathe.";
