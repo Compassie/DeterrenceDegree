@@ -77,7 +77,7 @@
 </div>
 
 <div id="terminal">
-    <div class="header"><span>SOPHON_INTERFACE_V.28</span><span id="step-count">AXIOM_AUDIT</span></div>
+    <div class="header"><span>SOPHON_INTERFACE_V.29</span><span id="step-count">AXIOM_AUDIT</span></div>
     <div id="start-page" class="screen active">
         <div class="screen-content">
             <h1>THE DETERRENCE AUDIT</h1>
@@ -94,12 +94,12 @@
     <div id="result-page" class="screen">
         <div class="screen-content">
             <div class="score-box">
-                <div style="font-size: 0.7rem; letter-spacing: 3px;">DETERRENCE PROBABILITY</div>
+                <div style="font-size: 0.7rem; letter-spacing: 3px;">DETERRENCE DEGREE</div>
                 <div class="big-score" id="score-display">0.0%</div>
                 <div id="profile-title" style="font-weight:bold; margin-top: 10px; font-size: 0.9rem;"></div>
             </div>
             <div id="analysis-content" style="line-height: 1.5; font-size: 0.85rem; padding: 10px; border-left: 2px solid var(--glow);"></div>
-            <button id="cert-btn" onclick="generateCertificate()">GENERATE AUDIT CERTIFICATE</button>
+            <button id="cert-btn" onclick="generateCertificate()">SAN-TI RESPONSE TACTICS</button>
             <div id="certificate">
                 <h3 style="text-align:center; margin-bottom: 10px;">NEURAL AUDIT WARNING</h3>
                 <p>STATUS: <span id="cert-threat"></span></p>
@@ -108,7 +108,7 @@
                 <p id="cert-warning-text" style="font-size: 0.8rem; font-style: italic; border-top: 1px solid var(--glow); padding-top: 10px; margin-top: 10px;"></p>
                 <button onclick="prepareDownload()">DOWNLOAD REPORT</button>
             </div>
-            <button style="border-color:var(--warn); color:var(--warn); margin-top: 10px;" onclick="location.reload()">RE-INITIALIZE AUDIT</button>
+            <button style="border-color:var(--warn); color:var(--warn); margin-top: 10px;" onclick="location.reload()">RE-INITIALIZE (DANGEROUS)</button>
         </div>
     </div>
 </div>
@@ -237,7 +237,6 @@
             content.innerText = "SOPHON ANALYSIS: This subject is an evolutionary error. You possess neither the logic to survive nor the brutality to deter. Humanity views you as a comfort; Trisolaris views you with absolute disdain. You are not a player in the cosmic game; you are the grass the predators walk upon. A waste of neural complexity. Your existence is a noise that will soon be silenced by entropy.";
         }
         
-        // Update Export Content
         document.getElementById('export-content').innerHTML = content.innerHTML;
     }
 
@@ -246,11 +245,11 @@
         const id = Math.random().toString(36).substr(2, 4).toUpperCase() + "-" + timestamp;
         const scoreVal = parseFloat(document.getElementById('score-display').innerText);
         let threat, warning;
-        if (scoreVal >= 90) { threat = "CRITICAL / INVASION HALTED"; warning = "[SOPHON WARNING]: Subject is a perfect mirror of the Dark Forest. Probability of total mutual destruction is 100%."; }
+        if (scoreVal >= 90) { threat = "CRITICAL / INVASION HALTED"; warning = "[SOPHON WARNING]: Subject is a perfect mirror of the Dark Forest. Probability of total mutual destruction is 100%. The fleet must maintain a distance of 1.2 light-years."; }
         else if (scoreVal >= 70) { threat = "HIGH / TACTICAL DELAY"; warning = "[SOPHON WARNING]: High logical resistance detected. Avoid direct confrontation until internal noise increases."; }
-        else if (scoreVal >= 40) { threat = "MODERATE / PROBING AUTHORIZED"; warning = "[SOPHON WARNING]: Deterrence is unstable. Probability of hesitation is high."; }
+        else if (scoreVal >= 40) { threat = "MODERATE / PROBING AUTHORIZED"; warning = "[SOPHON WARNING]: Deterrence is unstable. Probability of hesitation is high. Deployment of Droplets authorized."; }
         else if (scoreVal >= 10) { threat = "LOW / IMMINENT COLLAPSE"; warning = "[SOPHON WARNING]: Subject values 'Humanity' over 'Survival'. Total compliance predicted within 48 hours."; }
-        else { threat = "NULL / TOTAL EXTINCTION AUTHORIZED"; warning = "[SOPHON WARNING]: There is no Swordholder. Initiate the 'Australia Migration' protocol immediately."; }
+        else { threat = "NULL / TOTAL EXTINCTION AUTHORIZED"; warning = "[SOPHON WARNING]: There is no Swordholder. The switch is held by a child. Initiate the 'Australia Migration' protocol immediately."; }
 
         document.getElementById('cert-id').innerText = id;
         document.getElementById('cert-threat').innerText = threat;
